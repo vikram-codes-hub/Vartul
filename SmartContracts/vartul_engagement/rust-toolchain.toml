@@ -1,0 +1,7 @@
+[toolchain]
+channel = "1.75.0"
+components = ["rustfmt", "clippy"]
+
+[profile.release]
+overflow-checks = true
+lto = "thin"
