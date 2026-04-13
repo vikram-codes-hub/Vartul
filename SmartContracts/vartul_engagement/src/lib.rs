@@ -20,7 +20,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
-declare_id!("REPLACE_WITH_DEPLOYED_PROGRAM_ID");
+declare_id!("AehNZSfNSq39vffKLvWouJEhuJgvPmHh6qMNB2LgpNue");
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 pub const SEED_STAKING: &[u8] = b"staking";

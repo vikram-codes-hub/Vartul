@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Models and Large Data sets
+*.pkl
+*.pb
+*.h5
+*.hdf5
+*.xlsx
+*.csv
+
+# Environments
+.env
+.env.*
+
+# OS generated files
+.DS_Store
+Thumbs.db

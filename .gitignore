@@ -11,15 +11,14 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # =====================
 # Environment files
 # =====================
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 
 # =====================
 # Frontend (Vite / React)
@@ -27,27 +26,37 @@ yarn-error.log*
 frontend/dist/
 frontend/.vite/
 frontend/node_modules/
+Frontend/dist/
+Frontend/.vite/
+Frontend/node_modules/
 
 # =====================
 # Backend (Node / Express)
 # =====================
 backend/node_modules/
 backend/logs/
+Backend/node_modules/
+Backend/logs/
 
 # =====================
-# Blockchain (Hardhat)
+# Blockchain (Hardhat / Solana)
 # =====================
 blockchain/node_modules/
 blockchain/cache/
 blockchain/artifacts/
 blockchain/coverage/
 blockchain/typechain/
+SmartContracts/*/target/
+SmartContracts/*/*.json
 
 # =====================
-# Hardhat temporary files
+# Machine Learning (Python)
 # =====================
-blockchain/.env
-blockchain/.env.local
+Vartul_ML/venv/
+Vartul_ML/__pycache__/
+Vartul_ML/*.pkl
+Vartul_ML/*.xlsx
+Vartul_ML/*.csv
 
 # =====================
 # IDE / Editor
@@ -55,6 +64,8 @@ blockchain/.env.local
 .vscode/
 .idea/
 *.swp
+*.suo
+*.sln
 
 # =====================
 # Misc

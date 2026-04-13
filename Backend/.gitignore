@@ -1,6 +1,3 @@
-# Node modules
-/node_modules
-
 # Logs
 logs
 *.log
@@ -9,8 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Environment variables
-.env
+# Node modules
+node_modules/
 
 # Runtime data
 pids
@@ -18,13 +15,12 @@ pids
 *.seed
 *.pid.lock
 
-# Coverage (like from Jest)
+# Coverage
 coverage
-*.lcov
 
 # Build output
-/dist
-/build
+dist
+build
 
 # OS files
 .DS_Store
@@ -34,3 +30,7 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Environment variables
+.env
+.env.*

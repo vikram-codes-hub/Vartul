@@ -1,0 +1,19 @@
+# Rust/Cargo
+/target
+/target/
+Cargo.lock
+
+# Solana / Keypairs
+*.json
+
+# Toolchains
+rust-toolchain.toml.save
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
