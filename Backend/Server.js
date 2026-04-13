@@ -16,6 +16,7 @@ import savedpostrouter from './Routes/Savedpostrouter.js';
 import Reelrouter from './Routes/Reelrouter.js';
 import engagementRouter from './routes/EngagementRoute.js';
 import governanceRouter from './routes/GovernanceRoute.js';
+import mlRouter from './routes/MlRoute.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -158,6 +159,8 @@ app.use('/api/reels',Reelrouter)
 app.use('/api/engagement', engagementRouter);
 //governance router
 app.use('/api/governance', governanceRouter);
+// ML router
+app.use('/api/ml', mlRouter);
 
 
 const PORT = process.env.PORT || 5000;

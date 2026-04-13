@@ -4,6 +4,7 @@ import cloudinary from "../Config/cloudinary.js";
 import Follow from "../Models/Follow.js";
 import multer from "multer";
 import IpfsService from "../Blockchain/IpfsService.js";
+import redisClient from "../Config/redis.js";
 
 // ── Multer memory storage (pipe buffer → Cloudinary) ──────────────────────────
 const storage = multer.memoryStorage();
@@ -160,7 +161,7 @@ export const uploadReel = async (req, res) => {
 
 
 // ==============================
-// GET FEED REELS (paginated)
+// GET FEED REELS (ML-ranked)
 // ==============================
 export const getFeedReels = async (req, res) => {
   try {
@@ -179,24 +180,84 @@ export const getFeedReels = async (req, res) => {
 
     const userIdStr = userId.toString();
 
-    const formatted = reels.map((reel) => ({
-      ...reel,
-      likesCount: reel.likes.length,
-      commentsCount: reel.comments.length,
-      isLiked: reel.likes.some((id) => id.toString() === userIdStr),
-      comments: reel.comments.slice(-3),
-    }));
+    // ── ML Feed Ranking ────────────────────────────────────────────────────────
+    // Score each reel via the ML service. Use Redis cache (key: ml:reel:<id>)
+    // to avoid calling ML on every request. Falls back to 0.5 if ML is down.
+    const { callML } = await import("../Utils/mlService.js");
+
+    const scoredReels = await Promise.all(
+      reels.map(async (reel) => {
+        const cacheKey = `ml:reel:${reel._id}`;
+
+        // Try Redis cache first
+        let mlScore = null;
+        try {
+          const cached = await redisClient.get(cacheKey);
+          if (cached) mlScore = parseFloat(cached);
+        } catch { /* Redis miss — continue */ }
+
+        if (mlScore === null) {
+          // Fetch creator engagement data for reputation signal
+          let stakeAmount = 0;
+          let creatorFollowers = reel.userId?.followersCount || 0;
+          try {
+            const eng = await import("../Models/Engagement_Model.js");
+            const creatorEng = await eng.default.findOne({ user: reel.userId?._id }).select("stakeAmount").lean();
+            stakeAmount = creatorEng?.stakeAmount || 0;
+          } catch { /* non-fatal */ }
+
+          const mlResult = await callML({
+            // Content signals
+            caption:            reel.description || "",
+            watch_time:         Math.round((reel.views || 0) * 0.4), // estimate
+            watch_percentage:   60,
+            likes:              reel.likes?.length || 0,
+            shares:             reel.shares || 0,
+            comments:           reel.comments?.length || 0,
+            views:              reel.views || 0,
+            video_length:       reel.duration || 60,
+            is_viral_video:     (reel.views || 0) > 10000 ? 1 : 0,
+            replay_count:       0,
+            save_video:         0,
+            // Creator signals
+            creator_reputation: Math.min(1, (creatorFollowers / 50000)),
+            creator_followers:  creatorFollowers,
+            stake_amount:       stakeAmount,
+          });
+
+          mlScore = mlResult ? mlResult.feed_score : 0.5;
+
+          // Cache for 5 minutes
+          try {
+            await redisClient.setEx(cacheKey, 300, String(mlScore));
+          } catch { /* cache write optional */ }
+        }
+
+        return {
+          ...reel,
+          likesCount:    reel.likes.length,
+          commentsCount: reel.comments.length,
+          isLiked:       reel.likes.some((id) => id.toString() === userIdStr),
+          comments:      reel.comments.slice(-3),
+          mlScore,
+        };
+      })
+    );
+
+    // Sort by ML feed score (highest first)
+    scoredReels.sort((a, b) => b.mlScore - a.mlScore);
 
     const total = await Reel.countDocuments({ isPublic: true });
 
     res.status(200).json({
       success: true,
-      reels: formatted,
+      reels: scoredReels,
       meta: {
         page,
         limit,
         total,
         hasMore: skip + reels.length < total,
+        mlRanked: true,
       },
     });
   } catch (error) {

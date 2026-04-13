@@ -3,7 +3,7 @@ import useWatchTime from '../../hooks/useWatchTime';
 
 const DOUBLE_TAP_DELAY = 300;
 
-const ReelVideo = ({ src, isActive, reelId, isMuted, onMuteToggle, onDoubleTap, onView }) => {
+const ReelVideo = ({ src, isActive, reelId, isMuted, onMuteToggle, onDoubleTap, onView, onTrackRef }) => {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
@@ -14,7 +14,14 @@ const ReelVideo = ({ src, isActive, reelId, isMuted, onMuteToggle, onDoubleTap, 
   const viewTrackedRef = useRef(false);
 
   // ── Watch-time tracking ────────────────────────────────────────────────────
-  const { flushWatchData } = useWatchTime(reelId, duration, isPlaying);
+  // ── Watch-time + real signal tracking ────────────────────────────────────
+  const { flushWatchData, trackLike, trackShare, trackComment } =
+    useWatchTime(reelId, duration, isPlaying, videoRef);
+
+  // Expose interaction trackers to parent (for like/share/comment buttons)
+  useEffect(() => {
+    onTrackRef?.({ trackLike, trackShare, trackComment });
+  }, [onTrackRef, trackLike, trackShare, trackComment]);
 
   // ── Auto play/pause based on active state ──────────────────────────────────
   useEffect(() => {
@@ -75,6 +82,7 @@ const ReelVideo = ({ src, isActive, reelId, isMuted, onMuteToggle, onDoubleTap, 
       e.stopPropagation();
       setShowHeart(true);
       setTimeout(() => setShowHeart(false), 900);
+      trackLike();      // ← real like signal for ML
       onDoubleTap?.();
       lastTapRef.current = 0;
     } else {

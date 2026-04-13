@@ -21,11 +21,20 @@ export const logWatchSession = async (watchData) => {
 };
 
 // ── Watch Heartbeat (every 5s for W2E) ────────────────────────────────────────
-export const sendWatchHeartbeat = async (reelId) => {
+// Sends session signals to the backend for ML bot detection.
+export const sendWatchHeartbeat = async (reelId, signals = {}) => {
   try {
-    const { data } = await axiosInstance.post("/api/engagement/heartbeat", { reelId });
+    const { data } = await axiosInstance.post("/api/engagement/heartbeat", {
+      videoId: reelId,
+      watchTimeMs:      signals.watchTimeMs      ?? 5000,
+      watchPercentage:  signals.watchPercentage  ?? 60,
+      sessionDuration:  signals.sessionDuration  ?? 600,
+      videosPerSession: signals.videosPerSession ?? 6,
+      scrollSpeed:      signals.scrollSpeed      ?? 1.5,
+      skipTime:         signals.skipTime         ?? 5,
+    });
     return data;
-  } catch { /* Silent */ }
+  } catch { /* Silent — must never break UX */ }
 };
 
 // ── Get Engagement Status ─────────────────────────────────────────────────────
@@ -123,5 +132,16 @@ export const stakeOnCreator = async (creatorId, amount, lockDays = 7) => {
 // ── Get Creator Stakes (staked by me on others) ───────────────────────────────
 export const fetchCreatorStakes = async () => {
   const { data } = await axiosInstance.get("/api/engagement/creator-stakes");
+  return data;
+};
+
+// ── ML API ────────────────────────────────────────────────────────────────────
+export const checkMlHealth = async () => {
+  const { data } = await axiosInstance.get("/api/ml/health");
+  return data;
+};
+
+export const mlBotCheck = async (payload) => {
+  const { data } = await axiosInstance.post("/api/ml/bot-check", payload);
   return data;
 };

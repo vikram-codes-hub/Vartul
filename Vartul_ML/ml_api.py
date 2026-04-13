@@ -1,12 +1,30 @@
 from flask import Flask, request, jsonify
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
+import pickle
+import os
 
 from model1_engagement import predict as eng_predict
 from model2_bot_detection import predict as bot_predict
 from model3_feed_ranking import predict as feed_predict
 
 app = Flask(__name__)
+
+# ==============================
+# PRELOAD MODELS AT STARTUP
+# ==============================
+_BASE = os.path.dirname(os.path.abspath(__file__))
+
+def _load(path):
+    with open(path, "rb") as f:
+        return pickle.load(f)
+
+_model1 = _load(os.path.join(_BASE, "model1.pkl"))
+_model2 = _load(os.path.join(_BASE, "model2.pkl"))
+_model3 = _load(os.path.join(_BASE, "model3.pkl"))
+
+print("✅ All 3 ML models loaded at startup")
+
 
 # ==============================
 # TEXT SCORING FUNCTION (NEW)

@@ -393,17 +393,99 @@ export const claimIVTG = async (req, res) => {
 // ── W2E Watch Heartbeat (called every 5s of verified watch time) ──────────────
 export const watchHeartbeat = async (req, res) => {
   try {
-    const { videoId, watchTimeMs = 5000 } = req.body;
+    const {
+      videoId,
+      watchTimeMs = 5000,
+      // Optional session signals for bot detection
+      scrollSpeed       = 1.5,
+      skipTime          = 5,
+      watchPercentage   = 60,
+      sessionDuration   = 600,
+      videosPerSession  = 6,
+    } = req.body;
+
     const userId = req.user._id;
     if (!videoId) return res.status(400).json({ message: "videoId required" });
     if (watchTimeMs < 4000) return res.status(429).json({ message: "Heartbeat too frequent" });
 
-    const user = await User.findById(userId).select("watchSessionCount twtBalance virtualTwtBalance ivtgClaimed isVirtualConverted createdAt");
+    const user = await User.findById(userId).select(
+      "watchSessionCount twtBalance virtualTwtBalance ivtgClaimed isVirtualConverted createdAt"
+    );
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    const stake = await Engagement.findOne({ user: userId, status: "active" }).select("stakeAmount");
+
+    // ── ML Bot Detection ───────────────────────────────────────────────────────
+    const { callML } = await import("../Utils/mlService.js");
+    const mlResult = await callML({
+      scroll_speed:       scrollSpeed,
+      skip_time:          skipTime,
+      watch_percentage:   watchPercentage,
+      session_duration:   sessionDuration,
+      videos_per_session: videosPerSession,
+      watch_time:         Math.round(watchTimeMs / 1000),
+      likes:              0,
+      shares:             0,
+      comments:           0,
+      stake_amount:       stake?.stakeAmount || 0,
+      // feed/engagement fields (not used for bot detection but required by /predict)
+      creator_reputation: 0.5,
+      creator_followers:  100,
+      views:              0,
+    });
+
+    const botResult = mlResult?.bot;
+
+    // NOTE: Frontend sends estimated/hardcoded signals (scroll_speed, skipTime, likes=0)
+    // so we apply stricter thresholds here to avoid false-positive bot flags.
+    // ML model threshold: 0.4 → remove_rewards, 0.7 → slash_stake
+    // Our effective threshold: 0.6 → remove_rewards, 0.8 → slash_stake
+    const botProb = botResult?.bot_probability ?? 0;
+    const effectiveAction = botProb >= 0.8 ? "slash_stake"
+                          : botProb >= 0.6 ? "remove_rewards"
+                          : "allow";
+
+    // Act on bot detection result
+    if (effectiveAction === "slash_stake") {
+      // Suspend the engagement stake
+      await Engagement.findOneAndUpdate(
+        { user: userId, status: "active" },
+        { status: "suspended" }
+      );
+      console.warn(`[BotDetection] 🚨 Stake suspended for user ${userId} — prob: ${botResult.bot_probability}`);
+      return res.status(200).json({
+        success: false,
+        earned: 0,
+        twtBalance: user.twtBalance,
+        virtualTwtBalance: user.virtualTwtBalance,
+        isVirtualConverted: user.isVirtualConverted,
+        botWarning: true,
+        botAction: "slash_stake",
+        botProbability: botResult.bot_probability,
+        trustScore: botResult.trust_score,
+        message: "⚠️ Suspicious activity detected. Your stake has been suspended.",
+      });
+    }
+
+    if (effectiveAction === "remove_rewards") {
+      console.warn(`[BotDetection] ⚠️ Rewards withheld for user ${userId} — prob: ${botResult.bot_probability}`);
+      return res.status(200).json({
+        success: false,
+        earned: 0,
+        twtBalance: user.twtBalance,
+        virtualTwtBalance: user.virtualTwtBalance,
+        isVirtualConverted: user.isVirtualConverted,
+        botWarning: true,
+        botAction: "remove_rewards",
+        botProbability: botResult.bot_probability,
+        trustScore: botResult.trust_score,
+        message: "⚠️ Suspicious activity detected. Rewards paused for this session.",
+      });
+    }
+    // ── End Bot Detection ──────────────────────────────────────────────────────
 
     user.watchSessionCount = (user.watchSessionCount || 0) + 1;
     const BASE_RATE_PER_5S = 0.5 / 12;
-    const stake = await Engagement.findOne({ user: userId, status: "active" }).select("stakeAmount");
     let multiplier = 1.0;
     if (stake?.stakeAmount >= 500) multiplier = 1.5;
     else if (stake?.stakeAmount >= 100) multiplier = 1.25;
@@ -425,7 +507,18 @@ export const watchHeartbeat = async (req, res) => {
       }
     }
     await user.save();
-    res.json({ success: true, earned, twtBalance: user.twtBalance, virtualTwtBalance: user.virtualTwtBalance, isVirtualConverted: user.isVirtualConverted });
+
+    res.json({
+      success: true,
+      earned,
+      twtBalance: user.twtBalance,
+      virtualTwtBalance: user.virtualTwtBalance,
+      isVirtualConverted: user.isVirtualConverted,
+      botWarning: false,
+      botAction: "allow",
+      botProbability: botResult?.bot_probability ?? 0,
+      trustScore: botResult?.trust_score ?? 100,
+    });
   } catch (err) {
     console.error("Heartbeat Error:", err);
     res.status(500).json({ message: "Error processing heartbeat" });

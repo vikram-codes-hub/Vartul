@@ -325,7 +325,7 @@ export const completeUserProfile = async (req, res) => {
         bio,
         profileCompleted: true
       },
-      { new: true }
+      { new: true, upsert: false }
     ).select("-password");
 
     res.status(200).json({
