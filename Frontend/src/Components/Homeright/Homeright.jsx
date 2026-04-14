@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { dummySuggested } from "../../assets/Storydummydata";
-import { Usercontext } from "../../context/Usercontext";
+import { Usercontext } from "../../Context/Usercontext";
 import axiosInstance from "../../Utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +11,7 @@ const Homeright = () => {
 
   const footerLinks = [
     ["About", "Help", "Press", "API", "Jobs", "Privacy"],
-    ["Terms", "Locations", "Language", "Meta Verified"],
+    ["Terms", "Locations", "Language"],
   ];
 
   const handleFollow = async (userId, idx) => {
