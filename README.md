@@ -12,6 +12,16 @@
     <img src="https://img.shields.io/badge/Backend-Node.js%20%7C%20Express-green?style=for-the-badge&logo=nodedotjs" alt="Backend" />
     <img src="https://img.shields.io/badge/Database-MongoDB-47A248?style=for-the-badge&logo=mongodb" alt="MongoDB" />
     <img src="https://img.shields.io/badge/Blockchain-Solana%20%7C%20Anchor-14F195?style=for-the-badge&logo=solana&logoColor=black" alt="Solana" />
+    <img src="https://img.shields.io/badge/ML-Python%20%7C%20Flask-FFD43B?style=for-the-badge&logo=python&logoColor=blue" alt="ML" />
+    <img src="https://img.shields.io/badge/Style-Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind" />
+  </p>
+  
+  <p>
+    <a href="#-key-features">Features</a> •
+    <a href="#-architecture--workflow">Architecture</a> •
+    <a href="#-getting-started">Getting Started</a> •
+    <a href="#-smart-contract-details">Smart Contracts</a> •
+    <a href="#-technology-stack">Tech Stack</a>
   </p>
 </div>
 
@@ -19,28 +29,61 @@
 
 ## 📖 Overview
 
-**VarTul** is a full-stack Web3 social platform designed to reward creators and users for their engagement. It seamlessly blends familiar social interactions—posts, stories, short-form reels, direct messaging, and profiles—with **Solana** wallet connectivity and on-chain **engagement staking**. 
+**VarTul** is a full-stack Web3 social platform designed to reward creators and users for their true engagement. It seamlessly blends familiar social interactions—posts, stories, short-form reels, direct messaging, and profiles—with **Solana** wallet connectivity and on-chain **engagement staking**. 
 
-By utilizing our native **TWT (Vartul Watch Token)**, users can stake their tokens in high-yield engagement pools, earn rewards for watching reels, and interact with an ecosystem secured by blockchain mechanics and an intelligent machine-learning backend.
+By utilizing our native **TWT (Vartul Watch Token)**, users can stake their tokens into high-yield engagement pools, earn rewards for watching reels, and interact with an ecosystem secured by blockchain mechanics and an intelligent machine-learning backend.
 
 ---
 
 ## ⚡ Key Features
 
-📱 **Immersive Social Feed**  
-Scroll through a dynamic feed of posts, stories, and short-form reels. Built for maximum engagement with smooth UI transitions and endless scrolling.
+| Feature | Description |
+| :--- | :--- |
+| 📱 **Immersive Social Feed** | Scroll through a dynamic feed of posts, stories, and short-form reels. Built for maximum engagement with smooth UI transitions and endless scrolling. |
+| 💬 **Real-Time Communication** | Stay connected with friends using our WebSocket-powered real-time direct messaging system, complete with typing indicators, read receipts, and online presence tracking. |
+| 🔗 **Seamless Web3 Integration** | Connect your Phantom or Backpack wallet easily. View real-time SPL token balances, manage your airdrops, and execute transactions directly from your dashboard. |
+| 💎 **Proof-of-Engagement** | Lock your **TWT** tokens into our custom Anchor smart contract. Earn daily yields from the creator pool by hitting engagement milestones and watching reels (Watch-to-Earn). |
+| 🤖 **ML Bot Detection** | Powered by a Python/Flask Machine Learning microservice. Protects the ecosystem by identifying and flagging unauthentic bot interactions, ensuring rewards strictly go to real humans. |
 
-💬 **Real-Time Communication**  
-Stay connected with friends using our WebSocket-powered real-time direct messaging system, complete with typing indicators, read receipts, and online presence tracking.
+---
 
-🔗 **Seamless Web3 Integration**  
-Connect your Phantom or Backpack wallet directly. View real-time SPL token balances, manage your airdrops, and interact directly with the Solana blockchain from your dashboard.
+## 🏗️ Architecture & Workflow
 
-💎 **Proof-of-Engagement Staking**  
-Lock your **TWT** tokens into our custom Anchor smart contract. Earn daily yields from the creator pool by hitting engagement milestones and watching reels (Watch-to-Earn).
+VarTul boasts a modern microservices-inspired architecture, separating the client interface, REST API, real-time sockets, Machine Learning pipelines, and Blockchain interactions.
 
-🤖 **Intelligent Bot Detection (ML)**  
-Powered by a Python/Flask Machine Learning microservice. Protects the ecosystem by identifying and flagging unauthentic interactions, ensuring rewards go to real humans.
+```mermaid
+graph TD;
+    %% Styling
+    classDef frontend fill:#61DAFB,stroke:#333,stroke-width:2px,color:#000;
+    classDef backend fill:#8CC84B,stroke:#333,stroke-width:2px,color:#000;
+    classDef db fill:#47A248,stroke:#333,stroke-width:2px,color:#fff;
+    classDef crypto fill:#14F195,stroke:#333,stroke-width:2px,color:#000;
+    classDef ml fill:#FFD43B,stroke:#333,stroke-width:2px,color:#000;
+
+    %% Nodes
+    A[React / Vite Frontend]:::frontend
+    B(Node.js / Express Backend):::backend
+    C{Socket.io Server}:::backend
+    D((Solana Devnet)):::crypto
+    E[(MongoDB)]:::db
+    F[(Redis Cache)]:::db
+    G[Python ML Service]:::ml
+    H[Vartul Anchor Contract]:::crypto
+    I[TWT SPL Token]:::crypto
+
+    %% Edges
+    A -->|REST API & JWT| B
+    A <-->|Real-time WebSocket| C
+    A -->|RPC Wallet Calls| D
+    
+    B -->|Read / Write Data| E
+    B <-->|Cache / PubSub| F
+    B <-->|Analyze Behavior via API| G
+    B -->|Airdrop & Verification| D
+    
+    D --- H
+    D --- I
+```
 
 ---
 
@@ -48,46 +91,38 @@ Powered by a Python/Flask Machine Learning microservice. Protects the ecosystem 
 
 Discover the powerful tools bringing VarTul to life:
 
-### **Frontend Interface**
-> React 19 • Vite • Tailwind CSS 4 • Redux Toolkit
-- Fully responsive, glassmorphism-inspired UI components.
-- Seamless Solana wallet adapter integration (`@solana/wallet-adapter-react`).
+<details>
+<summary><b>🎨 Frontend Interface</b></summary>
 
-### **Backend & APIs**
-> Node.js • Express 5 • Socket.io
-- Robust RESTful APIs securing user endpoints with JWT authentication.
-- Real-time event handling for notifications and messaging.
+- **React 19 & Vite 7**: Blazing fast modular development.
+- **Tailwind CSS 4**: Modern, utility-first styling with glassmorphism UI components.
+- **Redux Toolkit**: Efficient global state management.
+- **Solana Wallet Adapters**: Seamless connection with Phantom, Backpack, etc.
+</details>
 
-### **Databases & Storage**
-> MongoDB DB • Redis • Cloudinary • Pinata IPFS
-- Mongoose schemas optimized for relational social data.
-- Redis caching layer for high-speed retrieval of feeds.
-- Decentralized media pinning via Pinata (IPFS) and fast asset delivery via Cloudinary.
+<details>
+<summary><b>⚙️ Backend & APIs</b></summary>
 
-### **Blockchain & Machine Learning**
-> Solana • Anchor Framework (Rust) • Python (Flask)
-- Custom SPL token (TWT) mint and airdrop infrastructure.
-- High-performance, low-cost smart contracts deployed on Solana Devnet.
-- Machine Learning pipelines for bot mitigation and feed ranking.
+- **Node.js & Express 5**: Robust RESTful API architecture.
+- **JWT Authentication**: Secure user session management.
+- **Socket.io**: Real-time event handling for notifications and messaging.
+</details>
 
----
+<details>
+<summary><b>🗄️ Databases & Storage</b></summary>
 
-## 🏗️ Architecture & Workflow
+- **MongoDB (Mongoose)**: Document schemas optimized for relational social data.
+- **Redis**: High-speed caching layer for feeds and session states.
+- **Cloudinary / Pinata IPFS**: Hybrid centralized/decentralized media pinning and fast asset delivery.
+</details>
 
-```mermaid
-graph TD;
-    A[React / Vite Frontend] -->|REST API & JWT| B(Node.js / Express Backend)
-    A -->|WebSocket| C{Socket.io Server}
-    A -->|RPC Calls| D((Solana Devnet))
-    
-    B -->|Read/Write| E[(MongoDB Profile & Feeds)]
-    B -->|Cache| F[(Redis Cache)]
-    B -->|API/gRPC| G[Python ML Service]
-    B -->|SPL Transfers| D
-    
-    D --- H[Vartul Anchor Smart Contract]
-    D --- I[TWT SPL Token]
-```
+<details>
+<summary><b>🧠 Blockchain & Machine Learning</b></summary>
+
+- **Solana Devnet**: High-performance, low-cost L1 infrastructure.
+- **Anchor Framework (Rust)**: Secure custom smart contracts.
+- **Python (Flask)**: Active bot mitigation and algorithmic feed ranking models.
+</details>
 
 ---
 
@@ -99,24 +134,25 @@ Follow these steps to instantiate your local development environment.
 - **Node.js**: v18+ (LTS Recommended)
 - **MongoDB**: Active connection string
 - **Redis**: Running local or cloud instance
+- **Python 3.10+**: For the ML Service
 - **Solana CLI & Anchor**: Only required if interacting directly with the Smart Contracts folder.
 
-### 1️⃣ Backend Setup
-```bash
-cd Backend
-npm install
-# Ensure your .env file is configured (see Environment Variables below)
-npm run dev
-```
-*API will start on `http://localhost:5000`.*
-
-### 2️⃣ Machine Learning Service Setup
+### 1️⃣ Machine Learning Service Setup
+We recommend starting the ML service first.
 ```bash
 cd Vartul_ML
 pip install -r requirements.txt
 python app.py
 ```
 *ML Service will start on `http://localhost:5001`.*
+
+### 2️⃣ Backend Setup
+```bash
+cd Backend
+npm install
+npm run dev
+```
+*API will start on `http://localhost:5000`.*
 
 ### 3️⃣ Frontend Setup
 ```bash
@@ -128,11 +164,11 @@ npm run dev
 
 ---
 
-## 🌱 Environment Variables
+## 🌱 Environment Variables Configuration
 
-Create a `.env` file in the `Backend/` directory with the following structure:
+Create the necessary `.env` files based on these templates:
 
-#### Example `Backend/.env`
+### `Backend/.env`
 ```env
 # Server
 PORT=5000
@@ -161,23 +197,51 @@ CLOUDINARY_API_SECRET=your_secret
 ML_SERVICE_URL=http://localhost:5001
 ```
 
-Create a `.env` file in the `Frontend/` directory:
-#### Example `Frontend/.env`
+### `Frontend/.env`
 ```env
+# Do not append /api to the URL.
 VITE_BACKEND_URL=http://localhost:5000
 ```
-*(Do not append `/api` to the URL. The VITE application handles URL construction natively).*
 
 ---
 
-## 🔐 Security & Operations
+## 📜 Smart Contract Details (Anchor)
 
-- **Never commit `.env` variables or wallet private keys.** Always keep them in your `.gitignore`.
-- Rotate your `JWT_SECRET` routinely in production.
-- Modify the CORS policy within `Backend/server.js` before deploying to a live origin to restrict unauthorized API consumption.
+The VarTul smart contract handles the core Proof-of-Engagement logic. 
+Located in `SmartContracts/vartul_engagement/src/lib.rs`.
+
+**Core Instructions:**
+1. `initialize`: Sets up the global platform state on the blockchain.
+2. `stake_engagement`: Allows a user to lock `TWT` tokens for a specific duration.
+3. `unstake`: Releases tokens back to the user after the lock duration expires, including yielded rewards.
+4. `reward_engagement`: Admin-only instruction to add TWT to the rewards pool.
+
+To test/deploy:
+```bash
+cd SmartContracts/vartul_engagement
+anchor build
+anchor deploy --provider.cluster devnet
+```
+
+---
+
+## 🔐 Security & Best Practices
+
+> [!WARNING]
+> **Environment Variables:** Never commit `.env` variables or wallet private keys. Keep them protected in your `.gitignore`.
+
+> [!TIP]
+> **Production Deployment:**
+> - Rotate your `JWT_SECRET` routinely.
+> - Modify the CORS policy within `Backend/server.js` before deploying to a live origin to restrict unauthorized API consumption.
+> - Consider migrating from Devnet to Mainnet-Beta once fully audited.
 
 ---
 
 <div align="center">
-  <p>Built with ❤️ by the Vartul Development Team.</p>
+  <br />
+  <p>Built with ❤️ by the VarTul Development Team</p>
+  <p>
+    <a href="https://solana.com/">Powered by Solana</a>
+  </p>
 </div>
