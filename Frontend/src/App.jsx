@@ -26,6 +26,7 @@ import Myprofile from "./Pages/Myprofile";
 import UserProfile from "./Pages/UserProfile";
 import EditProfile from "./Pages/Editporifle";
 import AuthPage from "./Pages/Authpage";
+import About from "./Pages/About";
 
 /* Profile setup */
 import BasicInfo from "./Pages/Basicinfo";
@@ -101,6 +102,10 @@ const App = () => {
           <Route
             path="/settings"
             element={authuser ? <Settings /> : <Navigate to="/auth" />}
+          />
+          <Route
+            path="/about"
+            element={authuser ? <About /> : <Navigate to="/auth" />}
           />
           <Route
             path="/chat"

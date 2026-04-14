@@ -110,9 +110,15 @@ const Homeright = () => {
             <div key={idx} className="flex flex-wrap gap-x-2 gap-y-1">
               {row.map((link, i) => (
                 <React.Fragment key={link}>
-                  <a href="#" className="text-[11px] text-gray-600 hover:text-gray-400 transition-colors">
-                    {link}
-                  </a>
+                  {link === 'About' ? (
+                    <a onClick={(e) => { e.preventDefault(); navigate('/about'); }} href="/about" className="text-[11px] text-gray-600 hover:text-gray-400 transition-colors cursor-pointer">
+                      {link}
+                    </a>
+                  ) : (
+                    <a href="#" className="text-[11px] text-gray-600 hover:text-gray-400 transition-colors">
+                      {link}
+                    </a>
+                  )}
                   {i < row.length - 1 && (
                     <span className="text-[11px] text-gray-600">·</span>
                   )}

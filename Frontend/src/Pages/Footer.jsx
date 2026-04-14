@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const [selectedLanguage, setSelectedLanguage] = useState('English');
@@ -35,13 +36,23 @@ const Footer = () => {
           {/* Footer Links */}
           <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 mb-8">
             {footerLinks.map((link, index) => (
-              <a
-                key={index}
-                href="#"
-                className="text-gray-400 text-xs font-normal hover:text-white transition-colors duration-300 hover:underline underline-offset-2"
-              >
-                {link}
-              </a>
+              link === 'About' ? (
+                <Link
+                  key={index}
+                  to="/about"
+                  className="text-gray-400 text-xs font-normal hover:text-white transition-colors duration-300 hover:underline underline-offset-2"
+                >
+                  {link}
+                </Link>
+              ) : (
+                <a
+                  key={index}
+                  href="#"
+                  className="text-gray-400 text-xs font-normal hover:text-white transition-colors duration-300 hover:underline underline-offset-2"
+                >
+                  {link}
+                </a>
+              )
             ))}
           </div>
 

@@ -1,6 +1,6 @@
 <div align="center">
   <br />
-  <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/solana/solana.png" alt="Solana Logo" width="80" />
+  <img src="https://cryptologos.cc/logos/solana-sol-logo.png" alt="Solana Logo" width="80" />
   <h1>✨ VarTul Engagement Platform ✨</h1>
   <p>
     <strong>A next-generation social platform combining Web3 staking with short-form media.</strong>
