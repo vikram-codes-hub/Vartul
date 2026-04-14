@@ -22,14 +22,14 @@ use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
 declare_id!("AehNZSfNSq39vffKLvWouJEhuJgvPmHh6qMNB2LgpNue");
 
-// ── Constants ─────────────────────────────────────────────────────────────────
+// Constants
 pub const SEED_STAKING: &[u8] = b"staking";
 pub const SEED_VAULT: &[u8] = b"vault";
 pub const SEED_STATE: &[u8] = b"engagement_state";
 pub const MIN_STAKE_DAYS: u64 = 1;
 pub const PLATFORM_SHARE_BPS: u64 = 1500; // 15% in basis points
 
-// ── Program ───────────────────────────────────────────────────────────────────
+// Program
 #[program]
 pub mod vartul_engagement {
     use super::*;
@@ -185,7 +185,7 @@ pub mod vartul_engagement {
     }
 }
 
-// ── Account Structs ───────────────────────────────────────────────────────────
+// Account Structs
 
 #[account]
 pub struct EngagementState {
@@ -205,7 +205,7 @@ pub struct StakingAccount {
     pub total_rewards_earned: u64,
 }
 
-// ── Contexts ──────────────────────────────────────────────────────────────────
+// Contexts
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
@@ -265,7 +265,7 @@ pub struct Unstake<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-// ── Events ────────────────────────────────────────────────────────────────────
+// Events
 
 #[event]
 pub struct StakeEvent {
@@ -290,7 +290,7 @@ pub struct UnstakeEvent {
     pub timestamp: i64,
 }
 
-// ── Errors ────────────────────────────────────────────────────────────────────
+// Errors
 
 #[error_code]
 pub enum VartulError {

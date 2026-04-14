@@ -238,7 +238,12 @@ export const getDashboardStats = async (req, res) => {
       }
     }
 
-    const liveBalance = onChainBalance !== null ? onChainBalance : (user.twtBalance || 0);
+    // ── Balance Logic ─────────────────────────────────────────────────────────
+    // DB balance is the source of truth — it accumulates all claims, airdrops,
+    // and stakes correctly. On-chain balance only reflects current SPL holdings
+    // and does NOT represent total earned (e.g. staked tokens reduce on-chain bal).
+    const dbBalance = user.twtBalance || 0;
+    const liveBalance = dbBalance; // Always trust the DB accumulated balance
 
     res.json({
       success: true,
@@ -248,6 +253,7 @@ export const getDashboardStats = async (req, res) => {
         staked: user.tokensStaked || 0,
         available: Math.max(0, liveBalance - (user.tokensStaked || 0)),
         onChain: onChainBalance !== null,
+        onChainBalance: onChainBalance, // expose raw on-chain for reference
       },
       engagement: {
         status: engagement?.status || "inactive",
