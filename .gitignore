@@ -71,3 +71,4 @@ Vartul_ML/*.csv
 # Misc
 # =====================
 coverage/
+SmartContracts/vartul_engagement/test-ledger/
