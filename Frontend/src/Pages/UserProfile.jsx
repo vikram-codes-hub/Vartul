@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Heart, MessageCircle, X, Grid, User, MoreHorizontal } from "lucide-react";
 import { checkFollowStatusApi, followUserApi, unfollowUserApi } from "../api/followApi";
-import { Usercontext } from "../context/Usercontext";
+import { Usercontext } from "../Context/Usercontext";
 import { usePost } from "../context/PostContext";
 import TipModal from "../Components/TipModal";
 import axios from "axios";
