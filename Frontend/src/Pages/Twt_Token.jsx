@@ -20,8 +20,8 @@ import IVTGBanner from '../Components/IVTGBanner';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 // ── Constants ─────────────────────────────────────────────────────────────
-const TOKEN_MINT = 'GwT16b6nPp9t793ba875QJ9QSyGgzA8yhQstz2UzetC8';
-const DEVNET_EXPLORER = `https://explorer.solana.com/address/${TOKEN_MINT}?cluster=custom&customUrl=http://localhost:8899`;
+const TOKEN_MINT = '67iMSEEeC39R9ToMFFDtw27HQTZeVhaS8ZC6G4q5DYnf';
+const DEVNET_EXPLORER = `https://explorer.solana.com/address/${TOKEN_MINT}?cluster=devnet`;
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 const formatTWT = (amount) => {
@@ -341,20 +341,37 @@ export default function Twt_Token() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {transactions.map((tx, idx) => (
-                      <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/[0.08] transition border border-white/10">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tx.status === 'confirmed' ? 'bg-emerald-500/20 border border-emerald-500/30' : 'bg-red-500/20 border border-red-500/30'}`}>
-                          {tx.status === 'confirmed' ? <CheckCircle className="w-5 h-5 text-emerald-400" /> : <X className="w-5 h-5 text-red-400" />}
+                    {transactions.map((tx, idx) => {
+                      const typeColors = {
+                        stake: 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300',
+                        unstake: 'bg-amber-500/20 border-amber-500/30 text-amber-300',
+                        airdrop: 'bg-purple-500/20 border-purple-500/30 text-purple-300',
+                        transfer: 'bg-blue-500/20 border-blue-500/30 text-blue-300',
+                      };
+                      const typeIcons = { stake: '🔒', unstake: '🔓', airdrop: '🪂', transfer: '↗' };
+                      const typeStyle = typeColors[tx.type] || typeColors.transfer;
+                      const typeIcon = typeIcons[tx.type] || '↗';
+                      return (
+                        <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/[0.08] transition border border-white/10">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center border text-base ${typeStyle}`}>
+                            {typeIcon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <p className="text-white text-sm font-semibold capitalize">{tx.type || 'Transfer'}</p>
+                              {tx.amount > 0 && (
+                                <span className="text-emerald-400 text-xs font-bold">{tx.type === 'stake' || tx.type === 'unstake' ? '' : '+'}{tx.amount.toFixed ? tx.amount.toFixed(2) : tx.amount} TWT</span>
+                              )}
+                            </div>
+                            <p className="text-gray-500 text-xs truncate">{tx.note || (tx.signature ? shortenAddress(tx.signature) : 'Unknown Tx')}</p>
+                            <p className="text-gray-600 text-[10px]">{tx.blockTime ? new Date(tx.blockTime * 1000).toLocaleString() : 'Recent'}</p>
+                          </div>
+                          <span className={`px-2 py-1 rounded-md text-[10px] uppercase font-bold tracking-wider ${tx.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                            {tx.status}
+                          </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-white text-sm font-mono truncate">{tx.signature ? shortenAddress(tx.signature) : 'Unknown Tx'}</p>
-                          <p className="text-gray-400 text-xs">{tx.blockTime ? new Date(tx.blockTime * 1000).toLocaleString() : 'Recent'}</p>
-                        </div>
-                        <span className={`px-2 py-1 rounded-md text-[10px] uppercase font-bold tracking-wider ${tx.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
-                          {tx.status}
-                        </span>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>

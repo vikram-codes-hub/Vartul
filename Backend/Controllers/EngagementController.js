@@ -16,6 +16,14 @@ export const stakeEngagement = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // ── Check user has enough balance ────────────────────────────────────────
+    const totalAvailable = (user.twtBalance || 0) + (user.virtualTwtBalance || 0);
+    if (totalAvailable < amount) {
+      return res.status(400).json({
+        message: `Insufficient TWT balance. You have ${totalAvailable.toFixed(2)} TWT available.`,
+      });
+    }
+
     const walletAddress = user.walletAddress || "mock_wallet";
 
     const txHash = await EngagementContract.stake_engagement(walletAddress, amount, durationDays);
@@ -25,14 +33,36 @@ export const stakeEngagement = async (req, res) => {
       engagement = new Engagement({ user: userId });
     }
 
-    engagement.stakeAmount = amount;
+    // ── Add to existing stake (not overwrite) ────────────────────────────────
+    engagement.stakeAmount = (engagement.stakeAmount || 0) + Number(amount);
     engagement.lockDurationDays = durationDays || 1;
     engagement.stakeStartTime = new Date();
     engagement.status = "active";
     engagement.accumulatedWatchTimeMs = 0;
 
     await engagement.save();
-    await User.findByIdAndUpdate(userId, { tokensStaked: amount });
+
+    // ── Deduct from twtBalance and accumulate tokensStaked ───────────────────
+    let deductFromReal = Math.min(user.twtBalance || 0, Number(amount));
+    let deductFromVirtual = Number(amount) - deductFromReal;
+    await User.findByIdAndUpdate(userId, {
+      $inc: {
+        twtBalance: -deductFromReal,
+        virtualTwtBalance: -deductFromVirtual,
+        tokensStaked: Number(amount),
+      },
+    });
+
+    // ── Log the transaction ──────────────────────────────────────────────────
+    const { default: TransactionLog } = await import("../Models/TransactionLog.js");
+    await TransactionLog.create({
+      user: userId,
+      type: "stake",
+      amount: Number(amount),
+      status: "confirmed",
+      txHash: txHash || null,
+      note: `Staked ${amount} TWT for ${durationDays || 1} day(s)`,
+    });
 
     res.status(200).json({
       success: true,
@@ -197,10 +227,12 @@ export const getDashboardStats = async (req, res) => {
     }
 
     // Try to get real on-chain balance if wallet exists
+    // Only use on-chain balance if it is > 0 (avoids overriding DB balance on local/devnet with no real tokens)
     let onChainBalance = null;
     if (user.walletAddress && user.walletAddress.length >= 32) {
       try {
-        onChainBalance = await TokenService.getTwtBalance(user.walletAddress);
+        const raw = await TokenService.getTwtBalance(user.walletAddress);
+        if (raw > 0) onChainBalance = raw; // only trust on-chain if it has tokens
       } catch {
         // fallback to DB balance
       }
@@ -293,28 +325,55 @@ export const getTokenBalance = async (req, res) => {
   }
 };
 
-// ── Get Wallet Transactions from Solana Devnet ────────────────────────────────
+// ── Get Wallet Transactions from Solana Devnet + DB logs ─────────────────────
 export const getWalletTransactions = async (req, res) => {
   try {
     const userId = req.user._id;
     const limit = parseInt(req.query.limit) || 15;
     const user = await User.findById(userId).select("walletAddress").lean();
 
-    if (!user?.walletAddress || user.walletAddress.length < 32) {
-      return res.json({
-        success: true,
-        transactions: [],
-        message: "No wallet linked",
-      });
+    // ── Always pull DB transaction logs ──────────────────────────────────────
+    const { default: TransactionLog } = await import("../Models/TransactionLog.js");
+    const dbLogs = await TransactionLog.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+    const dbTransactions = dbLogs.map((log) => ({
+      signature: log.txHash || `db_${log._id}`,
+      blockTime: Math.floor(new Date(log.createdAt).getTime() / 1000),
+      status: log.status || "confirmed",
+      type: log.type || "transfer",
+      amount: log.amount || 0,
+      note: log.note || "",
+      source: "db",
+    }));
+
+    // ── Try on-chain txs if wallet is linked ─────────────────────────────────
+    let onChainTxs = [];
+    if (user?.walletAddress && user.walletAddress.length >= 32) {
+      try {
+        onChainTxs = await TokenService.getWalletTransactions(user.walletAddress, limit);
+        onChainTxs = (onChainTxs || []).map((tx) => ({ ...tx, source: "onchain" }));
+      } catch {
+        // silently fall back to DB only
+      }
     }
 
-    const transactions = await TokenService.getWalletTransactions(user.walletAddress, limit);
+    // ── Merge: on-chain first, then DB entries not already in on-chain ────────
+    const onChainSigs = new Set(onChainTxs.map((t) => t.signature));
+    const uniqueDb = dbTransactions.filter((t) => !onChainSigs.has(t.signature));
+    const merged = [...onChainTxs, ...uniqueDb]
+      .sort((a, b) => (b.blockTime || 0) - (a.blockTime || 0))
+      .slice(0, limit);
 
     res.json({
       success: true,
-      walletAddress: user.walletAddress,
-      transactions,
-      explorerUrl: `https://explorer.solana.com/address/${user.walletAddress}?cluster=${TokenService.NETWORK}`,
+      walletAddress: user?.walletAddress || null,
+      transactions: merged,
+      explorerUrl: user?.walletAddress
+        ? `https://explorer.solana.com/address/${user.walletAddress}?cluster=${TokenService.NETWORK}`
+        : null,
     });
   } catch (error) {
     console.error("Wallet Transactions Error:", error);

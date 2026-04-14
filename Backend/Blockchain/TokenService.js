@@ -27,10 +27,16 @@ import {
 } from "@solana/spl-token";
 
 // ── Config ──────────────────────────────────────────────────────────────────
-const NETWORK = process.env.SOLANA_NETWORK || "devnet";
 const RPC_URL = process.env.SOLANA_RPC || clusterApiUrl("devnet");
-const TOKEN_MINT = process.env.TOKEN_MINT || "mntLxYdw5vwVHdigDwzrHEDWRP9ryPZj7pgN86HF5o9";
+const NETWORK = RPC_URL.includes("devnet") ? "devnet" : (process.env.SOLANA_NETWORK || "devnet");
+const TOKEN_MINT = process.env.TOKEN_MINT;
 const TOKEN_DECIMALS = parseInt(process.env.TOKEN_DECIMALS || "6");
+
+if (!TOKEN_MINT) {
+  console.error("[TokenService] ❌ TOKEN_MINT is not set in .env!");
+} else {
+  console.log(`[TokenService] ✅ Loaded TOKEN_MINT: ${TOKEN_MINT} | Network: ${NETWORK}`);
+}
 
 // ── Singleton Connection ────────────────────────────────────────────────────
 let _connection = null;
@@ -76,7 +82,7 @@ export const getMintInfo = async () => {
       explorerUrl: `https://explorer.solana.com/address/${TOKEN_MINT}?cluster=${NETWORK}`,
     };
   } catch (err) {
-    console.error("[TokenService] getMintInfo error:", err.message);
+    console.error("[TokenService] getMintInfo error:", String(err));
     // Return static info as fallback
     return {
       mintAddress: TOKEN_MINT,
@@ -84,7 +90,7 @@ export const getMintInfo = async () => {
       supply: null,
       network: NETWORK,
       explorerUrl: `https://explorer.solana.com/address/${TOKEN_MINT}?cluster=${NETWORK}`,
-      error: err.message,
+      error: String(err),
     };
   }
 };
@@ -175,7 +181,8 @@ export const airdropTWT = async (recipientWalletAddress, amount) => {
       explorerUrl: `https://explorer.solana.com/tx/${txSignature}?cluster=${NETWORK}`,
     };
   } catch (err) {
-    console.error(`[TokenService] airdropTWT error (${amount} TWT → ${recipientWalletAddress}):`, err.message);
+    console.error(`[TokenService] airdropTWT error (${amount} TWT → ${recipientWalletAddress}):`, String(err));
+    console.error(`[TokenService] airdropTWT full error:`, err);
     throw err;
   }
 };
