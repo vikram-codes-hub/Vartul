@@ -19,7 +19,7 @@ export const fetchWalletTransactions = async (limit = 15) => {
 };
 
 // ── Request TWT Airdrop (Devnet testing / rewards) ────────────────────────────
-export const requestAirdrop = async (amount = 100, walletAddress = null) => {
+export const requestAirdrop = async (walletAddress, amount = 100) => {
   const body = { amount };
   if (walletAddress) body.walletAddress = walletAddress;
   const res = await axiosInstance.post("/api/engagement/airdrop", body);

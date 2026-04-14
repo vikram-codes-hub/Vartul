@@ -322,7 +322,7 @@ export const getWalletTransactions = async (req, res) => {
   }
 };
 
-// ── Airdrop TWT (Admin / Devnet Testing) ─────────────────────────────────────
+// ── Airdrop TWT (Demo-safe: tries on-chain first, falls back to DB) ───────────
 export const airdropTokens = async (req, res) => {
   try {
     const { walletAddress, amount = 100 } = req.body;
@@ -337,26 +337,46 @@ export const airdropTokens = async (req, res) => {
 
     if (!targetWallet || targetWallet.length < 32) {
       return res.status(400).json({
-        message: "No valid wallet address. Link a wallet to your profile first.",
+        message: "No valid wallet address. Connect a wallet first.",
       });
     }
 
-    const result = await TokenService.airdropTWT(targetWallet, amount);
+    // ── Try real on-chain SPL transfer ────────────────────────────────────────
+    let onChain = false;
+    let signature = `demo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-    // Update DB balance to reflect the airdrop
+    try {
+      const result = await TokenService.airdropTWT(targetWallet, amount);
+      signature = result.txSignature;
+      onChain = true;
+      console.log(`[Airdrop] ✅ On-chain: ${amount} TWT → ${targetWallet} | TX: ${signature}`);
+    } catch (onChainErr) {
+      // Fallback: credit DB balance when token doesn't exist on this network
+      // or platform wallet has no TWT. Demo still works perfectly.
+      console.warn(`[Airdrop] ⚠️  On-chain failed (${onChainErr.message}). Crediting DB balance.`);
+    }
+
+    // ── Always update DB balance ───────────────────────────────────────────────
     await User.findByIdAndUpdate(userId, {
       $inc: { twtBalance: amount },
     });
 
     res.json({
       success: true,
-      message: `Successfully airdropped ${amount} TWT`,
-      ...result,
+      message: `✅ ${amount} TWT credited to your account!`,
+      signature,
+      amount,
+      recipient: targetWallet,
+      onChain,
+      mode: onChain ? "blockchain" : "simulated",
+      note: onChain
+        ? "Real SPL transfer on Solana"
+        : "Simulated airdrop — balance updated in DB",
     });
   } catch (error) {
     console.error("Airdrop Error:", error);
     res.status(500).json({
-      message: error.message || "Airdrop failed. Check platform wallet balance.",
+      message: error.message || "Airdrop failed.",
     });
   }
 };

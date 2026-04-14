@@ -20,8 +20,8 @@ import IVTGBanner from '../Components/IVTGBanner';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 // ── Constants ─────────────────────────────────────────────────────────────
-const TOKEN_MINT = 'mntLxYdw5vwVHdigDwzrHEDWRP9ryPZj7pgN86HF5o9';
-const DEVNET_EXPLORER = `https://explorer.solana.com/address/${TOKEN_MINT}?cluster=devnet`;
+const TOKEN_MINT = 'GwT16b6nPp9t793ba875QJ9QSyGgzA8yhQstz2UzetC8';
+const DEVNET_EXPLORER = `https://explorer.solana.com/address/${TOKEN_MINT}?cluster=custom&customUrl=http://localhost:8899`;
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 const formatTWT = (amount) => {
@@ -61,8 +61,9 @@ export default function Twt_Token() {
     if (!localWalletAddress) return;
     setLoadingTx(true);
     try {
-      const res = await fetchWalletTransactions(localWalletAddress, 10);
-      setTransactions(res.data?.transactions || []);
+      // Backend reads wallet from auth session; limit = 10
+      const data = await fetchWalletTransactions(10);
+      setTransactions(data?.transactions || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -89,8 +90,16 @@ export default function Twt_Token() {
     }
     setAirdropping(true);
     try {
-      const res = await requestAirdrop(localWalletAddress, 100);
-      toast.success(`✅ 100 TWT Airdropped! TX: ${shortenAddress(res.data.signature)}`);
+      // requestAirdrop already returns res.data (the JSON body)
+      const data = await requestAirdrop(localWalletAddress, 100);
+      const txShort = shortenAddress(data.signature);
+      const isOnChain = data.onChain;
+      toast.success(
+        isOnChain
+          ? `✅ 100 TWT sent on-chain! TX: ${txShort}`
+          : `✅ 100 TWT credited to your account! (${txShort})`
+      );
+      // Refresh balance so the UI updates immediately
       engagement.refreshStatus();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Airdrop failed');
