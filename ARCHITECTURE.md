@@ -266,54 +266,142 @@ _model2 = pickle.load("model2.pkl")   # Bot Detection (RF + scaler)
 _model3 = pickle.load("model3.pkl")   # Feed Ranking (Gradient Boosting)
 ```
 
-**The single `POST /predict` endpoint runs ALL 3 in sequence:**
+### Diagram 1 — ML Pipeline (All 3 Models in Sequence)
 
 ```mermaid
-graph TD
-    A[Node.js sends POST /predict with user session JSON]
-    A --> B[Step 1: Text Score from caption NLP keywords]
-    B --> C[Step 2: Model 1 calculates engagement_score]
-    C --> D[Step 3: Model 2 calculates bot probability + action]
-    D --> E[Step 4: Model 3 calculates feed recommendation_score]
-    E --> F["Final Score = 0.7 × feed_score + 0.3 × text_score"]
-    F --> G["Flask returns: { engagement_score, bot, feed_score }"]
-    G --> H[Node.js reads bot.action and applies consequence]
+flowchart TD
+    A["🗂️ Raw user session data\nwatch_time, scroll_speed, likes, shares..."]:::input
+
+    subgraph M1["Model 1 — Engagement Scorer"]
+        B["RandomForestRegressor\n100 trees · depth 12\nOutput → engagement_score (0 → ~162 float)"]:::model1
+    end
+
+    subgraph M2["Model 2 — Bot Detector"]
+        C["RandomForestClassifier + IsolationForest + LogisticRegression\nOutput → is_bot, bot_probability, trust_score (0–100), action\nallow / remove_rewards / slash_stake"]:::model2
+    end
+
+    subgraph M3["Model 3 — Feed Ranker + Reward Distributor"]
+        D["GradientBoostingRegressor · 150 trees · lr 0.05\nOutput → recommendation_score (0.0 → 1.0)\nReward pool split: 40% creators · 40% viewers · 20% treasury"]:::model3
+    end
+
+    E["🏆 Final TWT Reward Formula\nTWT = engagement_score × (trust_score / 100)"]:::reward
+
+    A --> M1
+    M1 -->|"engagement_score"| M2
+    M2 -->|"trust_score + engagement_score"| M3
+    M3 --> E
+
+    classDef input    fill:#4a4a4a,stroke:#888,color:#fff
+    classDef model1   fill:#3b4fd1,stroke:#6677ff,color:#fff
+    classDef model2   fill:#8b3a2a,stroke:#cc5533,color:#fff
+    classDef model3   fill:#2a6b4a,stroke:#33aa77,color:#fff
+    classDef reward   fill:#8b6010,stroke:#ddaa22,color:#fff
+```
+
+---
+
+### Diagram 2 — Bot Detection Decision Tree (Model 2 Internals)
+
+```mermaid
+flowchart TD
+    A["🔢 Behavioral signals (13 features)\nscroll_speed, skip_time, watch%, session_duration, likes..."]:::input
+
+    B["RandomForestClassifier (primary)\n100 trees · class_weight balanced · depth 10"]:::classifier
+
+    C{"bot_probability (0.0 → 1.0)\ntrust_score = (1 - prob) × 100"}:::decision
+
+    D["⛔ slash_stake\nCut staking rewards\nimmediately"]:::bad
+    E["⚠️ remove_rewards\nHalt TWT earnings\nfor this session"]:::warn
+    F["✅ allow\nNormal user\nCredit rewards"]:::good
+
+    G["TWT = engagement × trust/100\ne.g. score 85 × 0.92 = 78.2 TWT\nbot: 85 × 0.05 = 4.25 → zeroed"]:::formula
+
+    A --> B
+    B --> C
+    C -->|"≥ 0.70"| D
+    C -->|"0.40 – 0.69"| E
+    C -->|"< 0.40"| F
+    F --> G
+    E --> G
+
+    classDef input      fill:#4a4a4a,stroke:#888,color:#fff
+    classDef classifier fill:#3b4fd1,stroke:#6677ff,color:#fff
+    classDef decision   fill:#555,stroke:#aaa,color:#fff
+    classDef bad        fill:#7a1a1a,stroke:#cc3333,color:#fff
+    classDef warn       fill:#7a5a10,stroke:#ccaa22,color:#fff
+    classDef good       fill:#1a6a3a,stroke:#33aa66,color:#fff
+    classDef formula    fill:#2a6a2a,stroke:#44cc55,color:#fff
+```
+
+---
+
+### Diagram 3 — Node.js ↔ Python Communication (Step by Step)
+
+```mermaid
+flowchart LR
+    subgraph FE["React · Port 5173"]
+        A["① User watches reel\nFrontend collects session\nsignals in real-time"]:::fe
+    end
+
+    subgraph BE["Node.js Express · Port 5000"]
+        B["② EngagementController\nValidates JWT, assembles\nML payload from req.body"]:::node
+        D["④ Node processes result\nChecks bot.action field\nComputes final TWT reward\nUpdates MongoDB"]:::node
+        E2["⑤ Act on bot.action\nallow → credit virtualTWT\nremove_rewards → skip\nslash_stake → zero out"]:::node
+        G["MongoDB update\nvirtualTwtBalance ↑\naccumulatedWatchTime ↑\nisVerified flag set"]:::db
+        H["⑥ UI update\nShow earned TWT\nUpdate virtualTwtBalance\nFeed reordered by score"]:::fe
+    end
+
+    subgraph PY["Python Flask · Port 5001"]
+        C["③ Flask /predict endpoint\nModels preloaded at startup\nRuns M1 → M2 → M3\nin sequence"]:::py
+        C2["POST body payload\nwatch_time, watch_%\nlikes, shares, comments\nscroll_speed, skip_time\nstake_amount, views..."]:::payload
+        C3["JSON response\nengagement_score: 78.5\nbot.is_bot: false\nbot.trust_score: 92.0\nfeed_score: 0.812"]:::response
+    end
+
+    A -->|"axios + JWT\nPOST /api/engagement/logWatchTime"| B
+    B -->|"HTTP POST /predict"| C
+    C --> C2
+    C2 --> C3
+    C3 -->|"JSON back"| D
+    D --> E2
+    E2 --> G
+    G --> H
+
+    classDef fe      fill:#3b4fd1,stroke:#6677ff,color:#fff
+    classDef node    fill:#2a6b4a,stroke:#33aa77,color:#fff
+    classDef py      fill:#2a5a7a,stroke:#3399cc,color:#fff
+    classDef payload fill:#4a4a4a,stroke:#888,color:#fff
+    classDef response fill:#4a4a4a,stroke:#888,color:#fff
+    classDef db      fill:#7a5a10,stroke:#ccaa22,color:#fff
 ```
 
 **Final Reward Formula** (from `Run_all.py` line 126):
 ```
 Final TWT Reward = engagement_score × (trust_score / 100)
+
+Example:
+  Human → score=85, trust=92  → 85 × 0.92 = 78.2 TWT  ✅
+  Bot   → score=85, trust=5   → 85 × 0.05 = 4.25 TWT → zeroed ⛔
 ```
 
-So a user with `engagement_score=85` and `trust_score=92` earns `85 × 0.92 = 78.2 TWT`.
-A bot with `trust_score=5` earns `85 × 0.05 = 4.25 TWT` → soon zeroed out.
-
-### Node.js ↔ Python Communication
-
-Located in `Backend/routes/MlRoute.js` and called from `EngagementController.js`:
+### Node.js ↔ Python API Contract
 
 ```js
 // Node.js calls Python Flask at:
 POST http://localhost:5001/predict
-Content-Type: application/json
 Body: {
   watch_time, watch_percentage, likes, shares, comments,
   scroll_speed, skip_time, session_duration, videos_per_session,
   stake_amount, creator_reputation, creator_followers, views, caption
 }
 
-// Response:
+// Python responds:
 {
   engagement_score: 78.5,
-  bot: {
-    is_bot: false,
-    bot_probability: 0.08,
-    trust_score: 92.0,
-    action: "allow"
-  },
+  bot: { is_bot: false, bot_probability: 0.08, trust_score: 92.0, action: "allow" },
   feed_score: 0.812
 }
 ```
+
 
 ---
 
