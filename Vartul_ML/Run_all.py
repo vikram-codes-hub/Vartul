@@ -1,6 +1,5 @@
 """
 run_all.py — Vartul ML Pipeline
-=================================
 Trains all 3 models on the dataset and runs the full pipeline demo.
 
 Usage:
@@ -28,7 +27,7 @@ def main():
 
     total_start = time.time()
 
-    # ── Train ─────────────────────────────────────────────────────
+    # Train
     t = time.time()
     train1()
     print(f"\n  Model 1 done in {time.time()-t:.1f}s")
@@ -41,7 +40,7 @@ def main():
     train3()
     print(f"\n  Model 3 done in {time.time()-t:.1f}s")
 
-    # ── Full pipeline end-to-end demo ─────────────────────────────
+    # Full pipeline end-to-end demo
     print_section("Full Pipeline: One Interaction End-to-End")
 
     interaction = {
@@ -127,7 +126,7 @@ def main():
     print(f"\n  Final Reward = Engagement ({eng_score}) × Trust ({trust_mult:.2f})")
     print(f"  Final Reward      : {final_reward} TWT tokens")
 
-    # ── Epoch reward distribution demo ───────────────────────────
+    # Epoch reward distribution demo
     print_section("Epoch Reward Distribution Demo")
     dist = distribute_epoch_rewards(
         total_pool=10000.0,

@@ -1,6 +1,6 @@
 """
 model1_engagement.py — Vartul Engagement Score Model
-======================================================
+
 Predicts engagement_score from raw user activity signals.
 
 Features (inputs) — only raw signals, no pre-calculated scores:
@@ -26,7 +26,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 from utils import load_data, print_section, DATA_PATH
 
-# ── Features: only raw user activity — no pre-calculated columns ─────────────
+# Features: only raw user activity — no pre-calculated columns
 FEATURES = [
     "watch_time",
     "watch_percentage",

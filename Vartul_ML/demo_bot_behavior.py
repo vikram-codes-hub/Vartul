@@ -1,10 +1,9 @@
 """
 demo_bot_behavior.py — Vartul Standalone Bot Detection Demo
-=============================================================
-Run this script to demonstrate the ML bot detection system
-WITHOUT needing the backend or frontend to be running.
 
-This calls the trained model2.pkl directly.
+Run this script to demonstrate the ML bot detection system
+without needing the backend or frontend running.
+Calls model2.pkl directly.
 
 Usage:
   cd Vartul_ML
@@ -24,7 +23,7 @@ from model1_engagement import predict as eng_predict
 from model2_bot_detection import predict as bot_predict
 from model3_feed_ranking import predict as feed_predict
 
-# ── ANSI Terminal Colors ──────────────────────────────────────────────────────
+# ANSI terminal colors
 GREEN  = "\033[92m"
 RED    = "\033[91m"
 YELLOW = "\033[93m"
@@ -48,13 +47,13 @@ def print_header():
     print(f"    bot_prob  < 0.40  →  {GREEN}✅ ALLOW       (rewards paid normally){RESET}")
     print(f"    bot_prob  ≥ 0.40  →  {YELLOW}⚠️  REMOVE REWARDS (TWT earnings halted){RESET}")
     print(f"    bot_prob  ≥ 0.70  →  {RED}🚨 SLASH STAKE   (staking suspended){RESET}")
-    print(f"\n  {BOLD}Key Bot Signals the model watches:{RESET}")
+    print(f"\n  {BOLD}Key bot signals the model watches:{RESET}")
     print(f"    scroll_speed > 10   (humans = 1–3,  bots = 10–30+)")
     print(f"    videos/session > 50 (humans = 3–10, bots = 80–300)")
     print(f"    watch_time = 1s     (humans = 30–60s)")
     print(f"    skip_time = 0       (bots never wait)")
     print(f"    stake_amount = 0    (bots never stake TWT)")
-    print(f"\n  {BOLD}Final Reward Formula:{RESET}")
+    print(f"\n  {BOLD}Final reward formula:{RESET}")
     print(f"    {CYAN}TWT = engagement_score × (trust_score / 100){RESET}")
     print(f"{DIVIDER2}\n")
 
@@ -72,7 +71,7 @@ def run_full_pipeline(label, session, creator_reputation=0.7,
           f"likes={session['likes']}{RESET}")
     print()
 
-    # ── Step 1: Engagement Score ──────────────────────────────────────────────
+    # Step 1: Engagement score
     eng_score = eng_predict(
         watch_time=session["watch_time"],
         watch_percentage=session["watch_percentage"],
@@ -88,7 +87,7 @@ def run_full_pipeline(label, session, creator_reputation=0.7,
     print(f"  {BLUE}[Model 1 — Engagement Scorer]{RESET}")
     print(f"    Engagement Score : {BOLD}{eng_score:.4f}{RESET}  (0–162 scale)")
 
-    # ── Step 2: Bot Detection ─────────────────────────────────────────────────
+    # Step 2: Bot detection
     bot = bot_predict(
         scroll_speed=session["scroll_speed"],
         skip_time=session["skip_time"],
@@ -115,7 +114,7 @@ def run_full_pipeline(label, session, creator_reputation=0.7,
     print(f"         Trust Score     : {BOLD}{bot['trust_score']:.1f}/100{RESET}")
     print(f"         Action          : {color}{BOLD}{bot['action'].upper()}{RESET}")
 
-    # ── Step 3: Feed Score ────────────────────────────────────────────────────
+    # Step 3: Feed ranking
     feed_score = feed_predict(
         engagement_score=eng_score,
         creator_reputation=creator_reputation,
@@ -128,7 +127,7 @@ def run_full_pipeline(label, session, creator_reputation=0.7,
     print(f"\n  {BLUE}[Model 3 — Feed Ranker]{RESET}")
     print(f"    Recommendation   : {BOLD}{feed_score:.4f}{RESET}  (0.0–1.0, higher = shown first)")
 
-    # ── Final Reward ──────────────────────────────────────────────────────────
+    # Final reward calculation
     trust_mult   = bot["trust_score"] / 100.0
     final_reward = round(eng_score * trust_mult, 4)
 
@@ -146,7 +145,6 @@ def run_full_pipeline(label, session, creator_reputation=0.7,
     time.sleep(0.5)
 
 
-# ── SCENARIOS ─────────────────────────────────────────────────────────────────
 SCENARIOS = [
     {
         "label": "1️⃣  NORMAL HUMAN USER",

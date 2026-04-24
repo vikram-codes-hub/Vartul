@@ -1,6 +1,5 @@
 """
 model3_feed_ranking.py — Vartul Feed Ranking + Reward Distribution
-====================================================================
 Predicts recommendation_score to rank content in the feed.
 Also handles epoch-end reward pool distribution.
 
@@ -37,7 +36,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 from utils import load_data, print_section, DATA_PATH
 
-# ── Features — no recommendation_score, no bot_probability ───────────────────
+# Features — no recommendation_score, no bot_probability
 FEATURES = [
     "engagement_score",
     "creator_reputation",

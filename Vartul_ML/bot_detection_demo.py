@@ -1,6 +1,5 @@
 """
 bot_detection_demo.py — Vartul Bot Detection Demo
-===================================================
 Run this script to demonstrate the ML bot detection system.
 
 Usage:
@@ -25,7 +24,7 @@ import requests
 import time
 import json
 
-# ── CONFIG ────────────────────────────────────────────────────────────────────
+# Config
 API_BASE  = "http://localhost:5000"
 TOKEN     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWRjZTExNzQ3ZDJlMTAyOGY5MjcwODkiLCJpYXQiOjE3NzYwODMyMjN9.IfofRcVEblmR2a_XyiSji4nfTInPjzpGhoa7zO33lWo'
 
@@ -37,7 +36,7 @@ HEADERS = {
 # A real video ID from your app (any reel _id from the DB)
 VIDEO_ID = "69b933d756fc03a308ce9429"      # ← paste any reel _id here
 
-# ── ANSI colors ───────────────────────────────────────────────────────────────
+# ANSI colors
 GREEN  = "\033[92m"
 RED    = "\033[91m"
 YELLOW = "\033[93m"
@@ -85,7 +84,7 @@ def send_heartbeat(label, signals):
         print(f"      {GREEN}✓ No warning — user rewarded normally{RESET}")
 
 
-# ── DEMO SCENARIOS ────────────────────────────────────────────────────────────
+# Demo scenarios
 SCENARIOS = [
     {
         "label": "1️⃣  Normal Human User",

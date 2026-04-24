@@ -3,7 +3,7 @@ import User from "../Models/User.js";
 import EngagementContract from "../Blockchain/EngagementContract.js";
 import TokenService from "../Blockchain/TokenService.js";
 
-// ── Stake TWT for Engagement Rewards ──────────────────────────────────────────
+// Stake TWT for engagement rewards
 export const stakeEngagement = async (req, res) => {
   try {
     const { amount, durationDays } = req.body;
@@ -16,7 +16,7 @@ export const stakeEngagement = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // ── Check user has enough balance ────────────────────────────────────────
+    // Check user has enough balance
     const totalAvailable = (user.twtBalance || 0) + (user.virtualTwtBalance || 0);
     if (totalAvailable < amount) {
       return res.status(400).json({
@@ -33,7 +33,7 @@ export const stakeEngagement = async (req, res) => {
       engagement = new Engagement({ user: userId });
     }
 
-    // ── Add to existing stake (not overwrite) ────────────────────────────────
+    // Add to existing stake (not overwrite)
     engagement.stakeAmount = (engagement.stakeAmount || 0) + Number(amount);
     engagement.lockDurationDays = durationDays || 1;
     engagement.stakeStartTime = new Date();
@@ -42,7 +42,7 @@ export const stakeEngagement = async (req, res) => {
 
     await engagement.save();
 
-    // ── Deduct from twtBalance and accumulate tokensStaked ───────────────────
+    // Deduct from twtBalance and accumulate tokensStaked
     let deductFromReal = Math.min(user.twtBalance || 0, Number(amount));
     let deductFromVirtual = Number(amount) - deductFromReal;
     await User.findByIdAndUpdate(userId, {
@@ -53,7 +53,7 @@ export const stakeEngagement = async (req, res) => {
       },
     });
 
-    // ── Log the transaction ──────────────────────────────────────────────────
+    // Log the transaction
     const { default: TransactionLog } = await import("../Models/TransactionLog.js");
     await TransactionLog.create({
       user: userId,
@@ -76,7 +76,7 @@ export const stakeEngagement = async (req, res) => {
   }
 };
 
-// ── Log Watch Time ─────────────────────────────────────────────────────────────
+// Log watch time
 export const logWatchTime = async (req, res) => {
   try {
     const { watchTimeMs, watchPercentage } = req.body;
@@ -108,7 +108,7 @@ export const logWatchTime = async (req, res) => {
   }
 };
 
-// ── Calculate & Distribute Daily Rewards ──────────────────────────────────────
+// Calculate and distribute daily rewards
 export const calculateRewards = async (req, res) => {
   try {
     const V_RESERVE = 1_000_000;
@@ -175,7 +175,7 @@ export const calculateRewards = async (req, res) => {
   }
 };
 
-// ── Get Engagement Status for Current User ────────────────────────────────────
+// Get engagement status for current user
 export const getEngagementStatus = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -206,7 +206,7 @@ export const getEngagementStatus = async (req, res) => {
   }
 };
 
-// ── Get Dashboard Stats for Current User ─────────────────────────────────────
+// Get dashboard stats for current user
 export const getDashboardStats = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -238,7 +238,7 @@ export const getDashboardStats = async (req, res) => {
       }
     }
 
-    // ── Balance Logic ─────────────────────────────────────────────────────────
+    // Balance logic
     // DB balance is the source of truth — it accumulates all claims, airdrops,
     // and stakes correctly. On-chain balance only reflects current SPL holdings
     // and does NOT represent total earned (e.g. staked tokens reduce on-chain bal).
@@ -276,7 +276,7 @@ export const getDashboardStats = async (req, res) => {
   }
 };
 
-// ── Get Token Info (Mint, Supply, Explorer) ───────────────────────────────────
+// Get token info
 export const getTokenInfo = async (req, res) => {
   try {
     const mintInfo = await TokenService.getMintInfo();
@@ -296,7 +296,7 @@ export const getTokenInfo = async (req, res) => {
   }
 };
 
-// ── Get Live On-Chain Token Balance for Auth User ─────────────────────────────
+// Get live on-chain token balance for auth user
 export const getTokenBalance = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -331,14 +331,14 @@ export const getTokenBalance = async (req, res) => {
   }
 };
 
-// ── Get Wallet Transactions from Solana Devnet + DB logs ─────────────────────
+// Get wallet transactions from Solana Devnet + DB logs
 export const getWalletTransactions = async (req, res) => {
   try {
     const userId = req.user._id;
     const limit = parseInt(req.query.limit) || 15;
     const user = await User.findById(userId).select("walletAddress").lean();
 
-    // ── Always pull DB transaction logs ──────────────────────────────────────
+    // Always pull DB transaction logs
     const { default: TransactionLog } = await import("../Models/TransactionLog.js");
     const dbLogs = await TransactionLog.find({ user: userId })
       .sort({ createdAt: -1 })
@@ -355,7 +355,7 @@ export const getWalletTransactions = async (req, res) => {
       source: "db",
     }));
 
-    // ── Try on-chain txs if wallet is linked ─────────────────────────────────
+    // Try on-chain txs if wallet is linked
     let onChainTxs = [];
     if (user?.walletAddress && user.walletAddress.length >= 32) {
       try {
@@ -366,7 +366,7 @@ export const getWalletTransactions = async (req, res) => {
       }
     }
 
-    // ── Merge: on-chain first, then DB entries not already in on-chain ────────
+    // Merge: on-chain first, then DB entries not already in on-chain
     const onChainSigs = new Set(onChainTxs.map((t) => t.signature));
     const uniqueDb = dbTransactions.filter((t) => !onChainSigs.has(t.signature));
     const merged = [...onChainTxs, ...uniqueDb]
@@ -387,7 +387,7 @@ export const getWalletTransactions = async (req, res) => {
   }
 };
 
-// ── Airdrop TWT (Demo-safe: tries on-chain first, falls back to DB) ───────────
+// Airdrop TWT (demo-safe: tries on-chain first, falls back to DB)
 export const airdropTokens = async (req, res) => {
   try {
     const { walletAddress, amount = 100 } = req.body;
@@ -406,7 +406,7 @@ export const airdropTokens = async (req, res) => {
       });
     }
 
-    // ── Try real on-chain SPL transfer ────────────────────────────────────────
+    // Try real on-chain SPL transfer
     let onChain = false;
     let signature = `demo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
@@ -421,7 +421,7 @@ export const airdropTokens = async (req, res) => {
       console.warn(`[Airdrop] ⚠️  On-chain failed (${onChainErr.message}). Crediting DB balance.`);
     }
 
-    // ── Always update DB balance ───────────────────────────────────────────────
+    // Always update DB balance
     await User.findByIdAndUpdate(userId, {
       $inc: { twtBalance: amount },
     });
@@ -450,7 +450,7 @@ import Tip from "../Models/Tip.js";
 import CreatorStake from "../Models/CreatorStake.js";
 import TransactionLog from "../Models/TransactionLog.js";
 
-// ── Claim Initial Virtual Token Grant (IVTG) ──────────────────────────────────
+// Claim initial virtual token grant (IVTG)
 export const claimIVTG = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -475,7 +475,7 @@ export const claimIVTG = async (req, res) => {
   }
 };
 
-// ── W2E Watch Heartbeat (called every 5s of verified watch time) ──────────────
+// W2E watch heartbeat
 export const watchHeartbeat = async (req, res) => {
   try {
     const {
@@ -500,7 +500,7 @@ export const watchHeartbeat = async (req, res) => {
 
     const stake = await Engagement.findOne({ user: userId, status: "active" }).select("stakeAmount");
 
-    // ── ML Bot Detection ───────────────────────────────────────────────────────
+    // ML bot detection
     const { callML } = await import("../Utils/mlService.js");
     const mlResult = await callML({
       scroll_speed:       scrollSpeed,
@@ -567,7 +567,7 @@ export const watchHeartbeat = async (req, res) => {
         message: "⚠️ Suspicious activity detected. Rewards paused for this session.",
       });
     }
-    // ── End Bot Detection ──────────────────────────────────────────────────────
+    // End bot detection
 
     user.watchSessionCount = (user.watchSessionCount || 0) + 1;
     const BASE_RATE_PER_5S = 0.5 / 12;
@@ -610,7 +610,7 @@ export const watchHeartbeat = async (req, res) => {
   }
 };
 
-// ── Send Tip to Creator ───────────────────────────────────────────────────────
+// Send tip to creator
 export const sendTip = async (req, res) => {
   try {
     const { toUserId, amount, message = "" } = req.body;
@@ -650,7 +650,7 @@ export const sendTip = async (req, res) => {
   }
 };
 
-// ── Get Tip History ───────────────────────────────────────────────────────────
+// Get tip history
 export const getTipHistory = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -673,7 +673,7 @@ export const getTipHistory = async (req, res) => {
   }
 };
 
-// ── Stake TWT on a Creator ────────────────────────────────────────────────────
+// Stake TWT on a creator
 export const stakeOnCreator = async (req, res) => {
   try {
     const { creatorId, amount, lockDays = 7 } = req.body;
@@ -712,7 +712,7 @@ export const stakeOnCreator = async (req, res) => {
   }
 };
 
-// ── Get My Creator Stakes ─────────────────────────────────────────────────────
+// Get my creator stakes
 export const getCreatorStakes = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -733,7 +733,7 @@ export const getCreatorStakes = async (req, res) => {
   }
 };
 
-// ── Unstake Engagement Tokens ─────────────────────────────────────────────────
+// Unstake engagement tokens
 export const unstakeEngagement = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -786,7 +786,7 @@ export const unstakeEngagement = async (req, res) => {
   }
 };
 
-// ── Get Reward History ────────────────────────────────────────────────────────
+// Get reward history
 export const getRewardHistory = async (req, res) => {
   try {
     const userId = req.user._id;

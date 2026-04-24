@@ -19,9 +19,7 @@ const StoryContextProvider = ({ children }) => {
   const [activeUserStories, setActiveUserStories] = useState(null);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
 
-  /* =========================
-     FETCH STORIES FEED
-  ========================= */
+  /* Fetch stories feed */
   const fetchStoriesFeed = async () => {
     try {
       setLoading(true);
@@ -35,9 +33,7 @@ const StoryContextProvider = ({ children }) => {
     }
   };
 
-  /* =========================
-     FETCH MY STORIES
-  ========================= */
+  /* Fetch my stories */
   const fetchMyStories = async () => {
     try {
       const { data } = await getMyStoriesApi();
@@ -47,9 +43,7 @@ const StoryContextProvider = ({ children }) => {
     }
   };
 
-  /* =========================
-     OPEN / CLOSE VIEWER
-  ========================= */
+  /* Open / close viewer */
   const openStoryViewer = (userStories, startIndex = 0) => {
     if (!userStories || !userStories.stories?.length) return;
     setActiveUserStories(userStories);
@@ -61,9 +55,7 @@ const StoryContextProvider = ({ children }) => {
     setActiveStoryIndex(0);
   };
 
-  /* =========================
-     VIEW STORY
-  ========================= */
+  /* View story */
   const viewStory = async (storyId) => {
     try {
       await viewStoryApi(storyId);
@@ -97,9 +89,7 @@ const StoryContextProvider = ({ children }) => {
     }
   };
 
-  /* =========================
-     DELETE STORY
-  ========================= */
+  /* Delete story */
   const deleteStory = async (storyId) => {
     try {
       const { data } = await deleteStoryApi(storyId);
@@ -133,9 +123,7 @@ const StoryContextProvider = ({ children }) => {
     }
   };
 
-  /* =========================
-     STORY NAVIGATION
-  ========================= */
+  /* Story navigation */
   const goToNextStory = () => {
     if (!activeUserStories) return false;
 
@@ -154,9 +142,7 @@ const StoryContextProvider = ({ children }) => {
     return false;
   };
 
-  /* =========================
-     USER NAVIGATION (SAFE)
-  ========================= */
+  /* User navigation (safe) */
   const buildAllStoriesArray = () => {
     const arr = [];
 

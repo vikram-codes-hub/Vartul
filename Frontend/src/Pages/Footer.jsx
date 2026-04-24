@@ -29,11 +29,9 @@ const Footer = () => {
       
     
 
-      {/* Footer */}
       <footer className="bg-black border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-6 py-10">
           
-          {/* Footer Links */}
           <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 mb-8">
             {footerLinks.map((link, index) => (
               link === 'About' ? (
@@ -56,10 +54,8 @@ const Footer = () => {
             ))}
           </div>
 
-          {/* Bottom Section */}
           <div className="flex flex-col sm:flex-row justify-center items-center gap-6 pt-6 border-t border-gray-900">
             
-            {/* Language Selector */}
             <div className="relative">
               <button
                 onClick={() => setIsLanguageOpen(!isLanguageOpen)}
@@ -74,7 +70,6 @@ const Footer = () => {
                 />
               </button>
               
-              {/* Language Dropdown */}
               {isLanguageOpen && (
                 <div className="absolute bottom-full left-0 mb-2 bg-gray-900 border border-gray-700 rounded-lg shadow-lg min-w-[120px] z-50">
                   {languages.map((language) => (
@@ -93,7 +88,6 @@ const Footer = () => {
               )}
             </div>
 
-            {/* Copyright */}
             <div className="text-gray-500 text-xs">
               © 2025 VARTUL
             </div>

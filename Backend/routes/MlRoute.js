@@ -4,7 +4,7 @@ import { isLoggedIn } from "../Middelwares/Isloggeddin.js";
 
 const router = express.Router();
 
-// ── POST /api/ml/score-reel ───────────────────────────────────────────────────
+// POST /api/ml/score-reel
 // Manually score a reel with the ML pipeline.
 // Body: all the fields that /predict expects.
 router.post("/score-reel", isLoggedIn, async (req, res) => {
@@ -20,7 +20,7 @@ router.post("/score-reel", isLoggedIn, async (req, res) => {
   }
 });
 
-// ── POST /api/ml/bot-check ────────────────────────────────────────────────────
+// POST /api/ml/bot-check
 // Run bot detection on a session payload.
 // Body: scroll_speed, skip_time, watch_percentage, session_duration,
 //       videos_per_session, watch_time, likes, shares, comments, stake_amount
@@ -49,7 +49,7 @@ router.post("/bot-check", isLoggedIn, async (req, res) => {
   }
 });
 
-// ── GET /api/ml/health ────────────────────────────────────────────────────────
+// GET /api/ml/health
 // Check if the ML service is reachable.
 router.get("/health", async (req, res) => {
   try {

@@ -401,7 +401,7 @@ export const uploadProfilePic=async(req,res)=>{
 }
 //controller to forget password
 
-// ── Connect Wallet to User Account ────────────────────────────────────────────
+// Connect wallet to user account
 export const connectWallet = async (req, res) => {
   try {
     const { walletAddress } = req.body;
@@ -442,7 +442,7 @@ export const connectWallet = async (req, res) => {
   }
 };
 
-// ── Disconnect Wallet from User Account ───────────────────────────────────────
+// Disconnect wallet from user account
 export const disconnectWallet = async (req, res) => {
   try {
     const userId = req.user._id;

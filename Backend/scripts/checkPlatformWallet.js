@@ -1,6 +1,6 @@
 /**
  * checkPlatformWallet.js
- * ──────────────────────
+ * 
  * Run this ONCE before your demo to verify the platform wallet
  * has enough SOL (for fees) and TWT (to airdrop to users).
  *
@@ -27,7 +27,7 @@ import {
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
 
-// ── Load env ──────────────────────────────────────────────────────────────────
+// Load env
 const RPC_URL  = process.env.SOLANA_RPC || clusterApiUrl("devnet");
 const MINT_ADDR = process.env.TOKEN_MINT;
 const DECIMALS  = parseInt(process.env.TOKEN_DECIMALS || "6");

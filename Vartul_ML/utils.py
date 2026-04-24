@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
-# ── Dataset path — update this if file is elsewhere ──────────────────────────
+# Dataset path — update this if file is elsewhere
 DATA_PATH = r"1773666452049_vartul_dataset_syn.xlsx"
 
 # Bot threshold: bot_probability > this value = bot

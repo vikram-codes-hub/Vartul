@@ -22,7 +22,7 @@ const UserContextProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  /* ================= CHECK AUTH ================= */
+  /* Check auth */
   const checkauth = async () => {
     try {
       const { data } = await axios.get("/api/auth/checkauth");
@@ -42,7 +42,7 @@ const UserContextProvider = ({ children }) => {
     }
   };
 
-  /* ================= LOGIN / SIGNUP ================= */
+  /* Login / Signup */
   const Login = async ({ state, credentials }) => {
     try {
       const { data } = await axios.post(`/api/auth/${state}`, credentials);
@@ -67,7 +67,7 @@ const UserContextProvider = ({ children }) => {
     }
   };
 
-  /* ================= COMPLETE PROFILE ================= */
+  /* Complete profile */
   const completeprofile = async (basicinfo) => {
     try {
       const { data } = await axios.post(
@@ -87,7 +87,7 @@ const UserContextProvider = ({ children }) => {
     }
   };
 
-  /* ================= UPDATE INTERESTS ================= */
+  /* Update interests */
   const updateUserInterests = async ({ interests, contentCategories }) => {
     try {
       const { data } = await axios.post(
@@ -108,7 +108,7 @@ const UserContextProvider = ({ children }) => {
     }
   };
 
-  /* ================= upload profile pic ================= */
+  /* Upload profile pic */
   const uploadProfilePicture = async (profilePicBase64) => {
   try {
     const { data } = await axios.put(
@@ -127,7 +127,7 @@ const UserContextProvider = ({ children }) => {
 };
 
 
-  /* ================= FETCH CURRENT USER ================= */
+  /* Fetch current user */
   const fetchuser = async () => {
     try {
       const { data } = await axios.get("/api/auth/getcurrentuser");
@@ -156,7 +156,7 @@ const UserContextProvider = ({ children }) => {
 
 
 
-  /* ================= SOCKET ================= */
+  /* Socket */
   const connectsocket = (UserData) => {
     if (!UserData || socket?.connected) return;
 
@@ -175,7 +175,7 @@ const UserContextProvider = ({ children }) => {
     setsocket(newsocket);
   };
 
-  /* ================= LOGOUT ================= */
+  /* Logout */
   const Logout = () => {
     socket?.disconnect();
     setsocket(null);
@@ -188,7 +188,7 @@ const UserContextProvider = ({ children }) => {
     toast.success("Logout successfully");
   };
 
-  /* ================= INIT ================= */
+  /* Init */
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common["token"] = token;

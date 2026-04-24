@@ -6,7 +6,7 @@ import multer from "multer";
 import IpfsService from "../Blockchain/IpfsService.js";
 import redisClient from "../Config/redis.js";
 
-// ── Multer memory storage (pipe buffer → Cloudinary) ──────────────────────────
+// Multer memory storage
 const storage = multer.memoryStorage();
 export const upload = multer({
   storage,
@@ -30,9 +30,7 @@ const uploadBufferToCloudinary = (buffer, options = {}) =>
     stream.end(buffer);
   });
 
-// ==============================
-// UPLOAD REEL (multipart/form-data)
-// ==============================
+// Upload reel (multipart/form-data)
 export const uploadReelMultipart = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -46,14 +44,14 @@ export const uploadReelMultipart = async (req, res) => {
       try { return JSON.parse(tags); } catch { return []; }
     })();
 
-    // ── 1. Upload to Cloudinary (primary CDN) ─────────────────────────────────
+    // Upload to Cloudinary (primary CDN)
     const videoUpload = await uploadBufferToCloudinary(req.file.buffer, {
       resource_type: "video",
       folder: "vartul/reels",
       transformation: [{ quality: "auto", fetch_format: "auto" }],
     });
 
-    // ── 2. Auto-generate thumbnail ────────────────────────────────────────────
+    // Auto-generate thumbnail
     let thumbnailUrl = "";
     try {
       const thumbResult = await cloudinary.uploader.upload(
@@ -69,7 +67,7 @@ export const uploadReelMultipart = async (req, res) => {
       // Thumbnail generation optional – don't fail the whole upload
     }
 
-    // ── 3. IPFS Upload (decentralized backup via Pinata) ──────────────────────
+    // IPFS Upload (decentralized backup via Pinata)
     let ipfsCid = null;
     let ipfsUrl = null;
     try {
@@ -111,9 +109,7 @@ export const uploadReelMultipart = async (req, res) => {
   }
 };
 
-// ==============================
-// UPLOAD REEL (base64 – legacy fallback)
-// ==============================
+// Upload reel (base64 – legacy fallback)
 export const uploadReel = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -160,9 +156,7 @@ export const uploadReel = async (req, res) => {
 };
 
 
-// ==============================
-// GET FEED REELS (ML-ranked)
-// ==============================
+// Get feed reels (ML-ranked)
 export const getFeedReels = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -180,7 +174,7 @@ export const getFeedReels = async (req, res) => {
 
     const userIdStr = userId.toString();
 
-    // ── ML Feed Ranking ────────────────────────────────────────────────────────
+    // ML feed ranking
     // Score each reel via the ML service. Use Redis cache (key: ml:reel:<id>)
     // to avoid calling ML on every request. Falls back to 0.5 if ML is down.
     const { callML } = await import("../Utils/mlService.js");
@@ -267,9 +261,7 @@ export const getFeedReels = async (req, res) => {
 };
 
 
-// ==============================
-// GET USER REELS
-// ==============================
+// Get user reels
 export const getUserReels = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -286,9 +278,7 @@ export const getUserReels = async (req, res) => {
 };
 
 
-// ==============================
-// LIKE / UNLIKE REEL
-// ==============================
+// Like / unlike reel
 export const likeReel = async (req, res) => {
   try {
     const { reelId } = req.params;
@@ -319,9 +309,7 @@ export const likeReel = async (req, res) => {
 };
 
 
-// ==============================
-// GET COMMENTS
-// ==============================
+// Get comments
 export const getReelComments = async (req, res) => {
   try {
     const { reelId } = req.params;
@@ -339,9 +327,7 @@ export const getReelComments = async (req, res) => {
 };
 
 
-// ==============================
-// ADD COMMENT
-// ==============================
+// Add comment
 export const commentOnReel = async (req, res) => {
   try {
     const { reelId } = req.params;
@@ -376,9 +362,7 @@ export const commentOnReel = async (req, res) => {
 };
 
 
-// ==============================
-// INCREMENT VIEW COUNT
-// ==============================
+// Increment view count
 export const incrementView = async (req, res) => {
   try {
     const { reelId } = req.params;
@@ -390,9 +374,7 @@ export const incrementView = async (req, res) => {
 };
 
 
-// ==============================
-// INCREMENT SHARE COUNT
-// ==============================
+// Increment share count
 export const incrementShare = async (req, res) => {
   try {
     const { reelId } = req.params;
@@ -410,9 +392,7 @@ export const incrementShare = async (req, res) => {
 };
 
 
-// ==============================
-// DELETE REEL
-// ==============================
+// Delete reel
 export const deleteReel = async (req, res) => {
   try {
     const { reelId } = req.params;

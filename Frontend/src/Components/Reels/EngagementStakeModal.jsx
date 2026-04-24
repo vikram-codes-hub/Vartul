@@ -73,7 +73,7 @@ const EngagementStakeModal = ({ isOpen, onClose, onSuccess }) => {
     toast.success('TX ID copied!');
   };
 
-  // ── Success Screen ──────────────────────────────────────────────────────────
+  // Success screen
   if (success) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -145,7 +145,7 @@ const EngagementStakeModal = ({ isOpen, onClose, onSuccess }) => {
     );
   }
 
-  // ── Stake Form ──────────────────────────────────────────────────────────────
+  // Stake form
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <div className="bg-gray-900 border border-indigo-500/30 rounded-2xl w-full max-w-sm p-6 text-white shadow-2xl relative overflow-hidden">

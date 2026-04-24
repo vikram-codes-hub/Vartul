@@ -67,7 +67,7 @@ const reelSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    // ── Decentralized storage (IPFS/Pinata) ─────────────────────────────────
+    // Decentralized storage (IPFS/Pinata)
     ipfsCid: {
       type: String,
       default: null, // IPFS Content Identifier — null if IPFS not configured

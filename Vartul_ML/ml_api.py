@@ -10,9 +10,7 @@ from model3_feed_ranking import predict as feed_predict
 
 app = Flask(__name__)
 
-# ==============================
 # PRELOAD MODELS AT STARTUP
-# ==============================
 _BASE = os.path.dirname(os.path.abspath(__file__))
 
 def _load(path):
@@ -26,9 +24,7 @@ _model3 = _load(os.path.join(_BASE, "model3.pkl"))
 print("✅ All 3 ML models loaded at startup")
 
 
-# ==============================
-# TEXT SCORING FUNCTION (NEW)
-# ==============================
+# TEXT SCORING FUNCTION 
 def get_text_score(caption):
     if not caption:
         return 0.5  # neutral
@@ -60,22 +56,16 @@ def home():
     return "ML API Running 🚀"
 
 
-# ==============================
 # MAIN PREDICT API
-# ==============================
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.json
 
-    # ==========================
     # STEP 1: TEXT SCORE
-    # ==========================
     caption = data.get("caption", "")
     text_score = get_text_score(caption)
 
-    # ==========================
     # STEP 2: ENGAGEMENT MODEL
-    # ==========================
     eng_score = eng_predict(
         watch_time=data["watch_time"],
         watch_percentage=data["watch_percentage"],
@@ -85,9 +75,7 @@ def predict():
         views=data["views"]
     )
 
-    # ==========================
     # STEP 3: BOT DETECTION
-    # ==========================
     bot = bot_predict(
         scroll_speed=data["scroll_speed"],
         skip_time=data["skip_time"],
@@ -101,9 +89,7 @@ def predict():
         stake_amount=data["stake_amount"]
     )
 
-    # ==========================
-    # STEP 4: FEED RANKING MODEL
-    # ==========================
+    # STEP 4: FEED RANKING
     feed = feed_predict(
         engagement_score=eng_score,
         creator_reputation=data["creator_reputation"],
@@ -120,9 +106,7 @@ def predict():
         views=data["views"]
     )
 
-    # ==========================
     # STEP 5: FINAL SCORE
-    # ==========================
     final_score = 0.7 * feed + 0.3 * text_score
 
     return jsonify({

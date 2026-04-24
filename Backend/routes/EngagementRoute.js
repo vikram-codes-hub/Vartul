@@ -26,7 +26,7 @@ import { isLoggedIn } from "../Middelwares/Isloggeddin.js";
 
 const router = express.Router();
 
-// ── Engagement / Staking ─────────────────────────────────────────────────────
+// Engagement / staking
 router.post("/stake", isLoggedIn, stakeEngagement);
 router.post("/unstake", isLoggedIn, unstakeEngagement);
 router.post("/watch", isLoggedIn, logWatchTime);
@@ -34,28 +34,28 @@ router.post("/distribute", isLoggedIn, calculateRewards); // ⚠️ Admin-only i
 router.get("/status", isLoggedIn, getEngagementStatus);
 router.get("/dashboard-stats", isLoggedIn, getDashboardStats);
 
-// ── Token / Blockchain ────────────────────────────────────────────────────────
+// Token / blockchain
 router.get("/token-info", getTokenInfo);                          // Public
 router.get("/token-balance", isLoggedIn, getTokenBalance);        // Live on-chain balance
 router.get("/transactions", isLoggedIn, getWalletTransactions);   // Solana devnet tx history
 router.post("/airdrop", isLoggedIn, airdropTokens);               // Airdrop TWT
 router.post("/transfer", isLoggedIn, transferTokens);             // Internal token transfer
 
-// ── IVTG — Initial Virtual Token Grant ────────────────────────────────────────
+// IVTG — Initial Virtual Token Grant
 router.post("/claim-ivtg", isLoggedIn, claimIVTG);
 
-// ── Watch-to-Earn Heartbeat ───────────────────────────────────────────────────
+// Watch-to-Earn heartbeat
 router.post("/heartbeat", isLoggedIn, watchHeartbeat);
 
-// ── Tipping ───────────────────────────────────────────────────────────────────
+// Tipping
 router.post("/tip", isLoggedIn, sendTip);
 router.get("/tips", isLoggedIn, getTipHistory);
 
-// ── Creator Staking Pools ─────────────────────────────────────────────────────
+// Creator staking pools
 router.post("/creator-stake", isLoggedIn, stakeOnCreator);
 router.get("/creator-stakes", isLoggedIn, getCreatorStakes);
 
-// ── History & Earnings ────────────────────────────────────────────────────────
+// History & earnings
 router.get("/reward-history", isLoggedIn, getRewardHistory);
 router.get("/creator-earnings", isLoggedIn, getCreatorEarnings);
 router.get("/tx-logs", isLoggedIn, getTransactionLogs);

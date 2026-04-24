@@ -21,9 +21,7 @@ export const PostProvider = ({ children }) => {
     },
   };
 
-  // ==============================
-  // FETCH FEED POSTS
-  // ==============================
+  // Fetch feed posts
   const fetchFeedPosts = async (reset = false) => {
     try {
       if (loading) return;
@@ -52,9 +50,7 @@ export const PostProvider = ({ children }) => {
     }
   };
 
-  // ==============================
-  // FETCH USER POSTS (PROFILE GRID)
-  // ==============================
+  // Fetch user posts (profile grid)
   const fetchUserPosts = async (userId) => {
     try {
       const res = await axios.get(
@@ -67,9 +63,7 @@ export const PostProvider = ({ children }) => {
     }
   };
 
-  // ==============================
-  // CREATE POST
-  // ==============================
+  // Create post
   const createPost = async ({ caption, media, mediaType }) => {
     try {
     
@@ -94,9 +88,7 @@ export const PostProvider = ({ children }) => {
     }
   };
 
-  // ==============================
-  // LIKE / UNLIKE POST
-  // ==============================
+  // Like / unlike post
 const toggleLike = async (postId) => {
   if (!user?._id) return;
 
@@ -166,9 +158,7 @@ const toggleLike = async (postId) => {
 };
 
 
-  // ==============================
-  // COMMENT ON POST
-  // ==============================
+  // Comment on post
 const commentOnPost = async (postId, text) => {
   if (!text.trim() || !user?._id) return;
 

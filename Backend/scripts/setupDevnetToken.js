@@ -1,6 +1,6 @@
 /**
  * setupDevnetToken.js — One-time Devnet TWT Token Setup
- * ======================================================
+ * 
  * Run from Backend/ directory:
  *   node scripts/setupDevnetToken.js
  *
@@ -34,14 +34,14 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// ── Config ────────────────────────────────────────────────────────────────────
+// Config
 const RPC_URL = process.env.SOLANA_RPC || clusterApiUrl("devnet");
 const TOKEN_DECIMALS = 6;
 const INITIAL_SUPPLY = 10_000_000; // 10 million TWT
 
 const conn = new Connection(RPC_URL, "confirmed");
 
-// ── Load Platform Keypair ─────────────────────────────────────────────────────
+// Load platform keypair
 let platformKp;
 try {
   const rawKey = JSON.parse(process.env.PLATFORM_PRIVATE_KEY);
@@ -160,7 +160,7 @@ async function main() {
   // Step 4: Update .env
   updateEnvFile(mintAddress);
 
-  // ── Final Summary ────────────────────────────────────────────────────────
+  // Final summary
   console.log("\n" + "=".repeat(65));
   console.log("🎉  SETUP COMPLETE!");
   console.log("=".repeat(65));

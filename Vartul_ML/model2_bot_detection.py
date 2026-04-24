@@ -1,6 +1,5 @@
 """
 model2_bot_detection.py — Vartul Bot Detection Model
-======================================================
 Detects bot sessions using behavioral signals only.
 
 Features (inputs) — only session behavior signals:
@@ -42,7 +41,7 @@ from sklearn.metrics import (classification_report, confusion_matrix,
 
 from utils import load_data, print_section, DATA_PATH, BOT_THRESHOLD
 
-# ── Features: raw behavioral signals only — bot_probability NOT included ──────
+# Features: raw behavioral signals only — bot_probability NOT included
 FEATURES = [
     "scroll_speed",
     "skip_time",
@@ -87,7 +86,7 @@ def train(data_path=DATA_PATH, save=True):
 
     print_section("Model 2: Algorithm Comparison")
 
-    # ── 1. Random Forest ─────────────────────────────────────────
+    # 1. Random Forest
     rf = RandomForestClassifier(
         n_estimators=100,
         max_depth=10,
@@ -99,13 +98,13 @@ def train(data_path=DATA_PATH, save=True):
     rf_pred = rf.predict(X_test)
     rf_prob = rf.predict_proba(X_test)[:, 1]
 
-    # ── 2. Logistic Regression ───────────────────────────────────
+    # 2. Logistic Regression
     lr = LogisticRegression(class_weight="balanced", max_iter=500, random_state=42)
     lr.fit(X_train_sc, y_train)
     lr_pred = lr.predict(X_test_sc)
     lr_prob = lr.predict_proba(X_test_sc)[:, 1]
 
-    # ── 3. Isolation Forest ──────────────────────────────────────
+    # 3. Isolation Forest
     iso = IsolationForest(
         n_estimators=100,
         contamination=bot_count / len(y),
@@ -128,7 +127,7 @@ def train(data_path=DATA_PATH, save=True):
             auc = 0.0
         print(f"  {name:<25} {acc:>9.2f}%  {auc:>10.4f}")
 
-    # ── Best model: Random Forest ─────────────────────────────────
+    # Best model: Random Forest
     print_section("Model 2: Random Forest — Detailed Report")
     print(classification_report(y_test, rf_pred, target_names=["Real user", "Bot"]))
 

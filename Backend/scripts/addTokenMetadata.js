@@ -19,7 +19,7 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 
-// ── Hardcoded Token Metadata Program ID ────────────────────────────────────
+// Hardcoded token metadata program ID
 const METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
 const RPC_URL  = process.env.SOLANA_RPC || clusterApiUrl("devnet");
@@ -44,7 +44,7 @@ console.log("Name    :", TOKEN_NAME);
 console.log("Symbol  :", TOKEN_SYMBOL);
 console.log("=".repeat(60) + "\n");
 
-// ── Derive Metadata PDA ─────────────────────────────────────────────────────
+// Derive metadata PDA
 function getMetadataPDA(mint) {
   const [pda] = PublicKey.findProgramAddressSync(
     [Buffer.from("metadata"), METADATA_PROGRAM_ID.toBuffer(), mint.toBuffer()],
@@ -53,7 +53,7 @@ function getMetadataPDA(mint) {
   return pda;
 }
 
-// ── Build CreateMetadataAccountV3 instruction manually ─────────────────────
+// Build CreateMetadataAccountV3 instruction manually
 // Instruction index 33 = CreateMetadataAccountV3
 function buildMetadataIx(metadataPDA, mint, mintAuthority, payer) {
   const nameBytes   = Buffer.from(TOKEN_NAME,   "utf8");

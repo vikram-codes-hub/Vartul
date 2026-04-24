@@ -1,6 +1,5 @@
 /**
  * WalletConnect — Compact wallet connect trigger & status display
- * ===============================================================
  * Uses WalletSelector modal for the actual connection flow.
  */
 import React, { useState, useEffect } from "react";
@@ -51,7 +50,7 @@ const WalletConnect = ({ onConnected, compact = false }) => {
   };
 
   if (walletAddress) {
-    // ── Connected State ──
+    // Connected state
     return (
       <div className={`bg-gradient-to-r from-emerald-900/30 to-green-900/20 border border-emerald-500/30 rounded-2xl ${compact ? "p-4" : "p-5"} space-y-3`}>
         <div className="flex items-center justify-between gap-3">
@@ -92,7 +91,7 @@ const WalletConnect = ({ onConnected, compact = false }) => {
     );
   }
 
-  // ── Not Connected State ──
+  // Not connected state
   return (
     <>
       <div className={`bg-white/5 border border-white/10 rounded-2xl ${compact ? "p-4" : "p-5"} space-y-3`}>

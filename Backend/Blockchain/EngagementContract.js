@@ -1,6 +1,5 @@
 /**
  * Engagement Contract Interface
- * ================================
  * Bridge between the Node.js backend and the on-chain Vartul smart contract.
  * Now uses TokenService for real SPL token distribution to users with wallets.
  * Falls back to DB-only tracking for users without wallet addresses.
@@ -14,10 +13,10 @@ class EngagementContract {
     this.programId = process.env.VARTUL_PROGRAM_ID || "Engagement_PoS_V1";
   }
 
-  // ─────────────────────────────────────────────────────────────────────────────
+ 
   // STAKE ENGAGEMENT
   // Records staking intent in DB. Real on-chain locking requires Anchor contract.
-  // ─────────────────────────────────────────────────────────────────────────────
+  
   async stake_engagement(walletAddress, amount, durationDays) {
     console.log(`[Contract] Staking ${amount} TWT for ${durationDays} days — Wallet: ${walletAddress}`);
 
@@ -33,11 +32,10 @@ class EngagementContract {
     return txHash;
   }
 
-  // ─────────────────────────────────────────────────────────────────────────────
+  
   // DISTRIBUTE REWARDS
   // For users with wallets: real SPL token transfer via TokenService.airdropTWT
-  // For users without wallets: DB-only balance update (off-chain ledger)
-  // ─────────────────────────────────────────────────────────────────────────────
+
   async distribute_rewards(distributions) {
     console.log(`[Contract] Distributing rewards to ${distributions.length} addresses`);
 
@@ -48,7 +46,7 @@ class EngagementContract {
 
     for (const { userId, wallet, amount, username } of distributions) {
       if (wallet && wallet.length >= 32 && wallet !== "mock_wallet") {
-        // Real on-chain transfer
+       
         try {
           const result = await TokenService.airdropTWT(wallet, amount);
           console.log(`[Contract] ✅ On-chain reward: ${amount} TWT → ${username || wallet}`);
@@ -60,13 +58,13 @@ class EngagementContract {
           results.push({ userId, wallet, amount, status: "db-fallback", error: err.message });
         }
       } else {
-        // No wallet — track in DB only
+      
         dbOnlyUpdates.push({ userId, amount });
         results.push({ userId, wallet: null, amount, status: "db-only" });
       }
     }
 
-    // Batch DB updates for all non-chain (or failed) distributions
+    // Batch DB updates for all non-chain
     if (dbOnlyUpdates.length > 0) {
       const updateOps = dbOnlyUpdates
         .filter((d) => d.userId)
@@ -93,10 +91,10 @@ class EngagementContract {
     return { txHash, results };
   }
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // GET STAKE STATUS
+
+  //get stacke status
   // Real on-chain TWT balance + DB staking state
-  // ─────────────────────────────────────────────────────────────────────────────
+ 
   async get_stake_status(walletAddress, userId) {
     let onChainBalance = null;
 
@@ -117,7 +115,7 @@ class EngagementContract {
       totalRewardsEarned: user?.totalRewardsEarned ?? 0,
       walletAddress: walletAddress || user?.walletAddress || null,
       onChainBalance,
-      unlockTime: Date.now() + 86400000, // mock — real: read from PDA account data
+      unlockTime: Date.now() + 86400000, 
     };
   }
 }

@@ -1,7 +1,7 @@
 /**
  * Solana.js — Legacy compatibility shim
- * =======================================
- * All real blockchain logic has been moved to TokenService.js
+  *
+ * all real Solana interactions  are now handled in TokenService.js
  * which uses the correct TOKEN_MINT env var and platform keypair.
  * This file re-exports from TokenService for backward compatibility.
  */

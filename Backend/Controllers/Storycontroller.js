@@ -3,9 +3,7 @@ import Follow from "../Models/Follow.js";
 import cloudinary from "../config/cloudinary.js";
 import redisClient, { redisReady } from "../Config/redis.js"
 
-/* =========================================
-   UPLOAD STORY
-========================================= */
+// Upload story
 export const uploadStory = async (req, res) => {
   try {
     if (!req.file) {
@@ -66,9 +64,7 @@ export const uploadStory = async (req, res) => {
 };
 
 
-/* =========================================
-   GET STORIES FEED 
-========================================= */
+// Get stories feed
 export const getStoriesFeed = async (req, res) => {
   try {
     const userId = req.user._id.toString();
@@ -170,9 +166,7 @@ export const getStoriesFeed = async (req, res) => {
   }
 };
 
-/* =========================================
-   VIEW STORY
-========================================= */
+// View story
 export const viewStory = async (req, res) => {
   try {
     const { storyId } = req.params;
@@ -209,9 +203,7 @@ export const viewStory = async (req, res) => {
   }
 };
 
-/* =========================================
-   GET MY STORIES
-========================================= */
+// Get my stories
 export const getMyStories = async (req, res) => {
   try {
     const userId = req.user._id.toString();
@@ -248,9 +240,7 @@ export const getMyStories = async (req, res) => {
   }
 };
 
-/* =========================================
-   GET USER STORIES
-========================================= */
+// Get user stories
 export const getUserStories = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -285,9 +275,7 @@ export const getUserStories = async (req, res) => {
   }
 };
 
-/* =========================================
-   GET STORY VIEWERS
-========================================= */
+// Get story viewers
 export const getStoryViewers = async (req, res) => {
   try {
     const { storyId } = req.params;
@@ -325,9 +313,7 @@ export const getStoryViewers = async (req, res) => {
   }
 };
 
-/* =========================================
-   DELETE STORY 
-========================================= */
+// Delete story
 export const deleteStory = async (req, res) => {
   try {
     const { storyId } = req.params;

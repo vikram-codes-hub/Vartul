@@ -1,6 +1,5 @@
 /**
  * WalletSelector — Premium Wallet Connection Modal
- * =================================================
  * Supports: Phantom · Backpack · Solflare
  * Detection: browser-native (window.phantom / window.backpack / window.solflare)
  */
@@ -14,7 +13,7 @@ import { Connection, clusterApiUrl, PublicKey, LAMPORTS_PER_SOL } from "@solana/
 const DEVNET = clusterApiUrl("devnet");
 const TOKEN_MINT = "mntLxYdw5vwVHdigDwzrHEDWRP9ryPZj7pgN86HF5o9";
 
-// ── Wallet definitions ──────────────────────────────────────────────────────
+// Wallet definitions
 const WALLET_DEFS = [
   {
     id: "phantom",
@@ -89,7 +88,7 @@ const WALLET_DEFS = [
   },
 ];
 
-// ── WalletSelector Modal ─────────────────────────────────────────────────────
+// WalletSelector Modal
 const WalletSelector = ({ isOpen, onClose, onConnected }) => {
   const adapter = useWallet();
   const [step, setStep]               = useState("select"); // select | connecting | connected | manual
@@ -114,7 +113,7 @@ const WalletSelector = ({ isOpen, onClose, onConnected }) => {
     setConnecting(null);
   }, [isOpen]);
 
-  // ── Connect Phantom / Solflare via wallet-adapter ──────────────────────────
+  // Connect Phantom / Solflare via wallet-adapter
   const connectAdapter = useCallback(async (walletDef) => {
     setConnecting(walletDef.id);
     setError(null);
@@ -139,7 +138,7 @@ const WalletSelector = ({ isOpen, onClose, onConnected }) => {
     }
   }, [adapter]);
 
-  // ── Connect Backpack via window.backpack ───────────────────────────────────
+  // Connect Backpack via window.backpack
   const connectBackpack = useCallback(async () => {
     if (!window.backpack) {
       window.open("https://backpack.app/", "_blank");
@@ -170,7 +169,7 @@ const WalletSelector = ({ isOpen, onClose, onConnected }) => {
     return connectAdapter(walletDef);
   }, [connectAdapter, connectBackpack]);
 
-  // ── Save to Vartul profile ─────────────────────────────────────────────────
+  // Save to Vartul profile
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -185,7 +184,7 @@ const WalletSelector = ({ isOpen, onClose, onConnected }) => {
     }
   };
 
-  // ── Manual connect ─────────────────────────────────────────────────────────
+  // Manual connect
   const handleManual = () => {
     if (!manualKey || manualKey.length < 32) {
       setError("Invalid Solana address — must be at least 32 characters.");
@@ -234,7 +233,7 @@ const WalletSelector = ({ isOpen, onClose, onConnected }) => {
           </div>
 
           <div className="p-6">
-            {/* ── CONNECTING STATE ── */}
+            {/* Connecting state */}
             {step === "connecting" && (
               <div className="flex flex-col items-center py-10 gap-4">
                 <div className="relative">
@@ -249,7 +248,7 @@ const WalletSelector = ({ isOpen, onClose, onConnected }) => {
               </div>
             )}
 
-            {/* ── CONNECTED STATE ── */}
+            {/* Connected state */}
             {step === "connected" && connectedKey && (
               <div className="space-y-5">
                 <div className="flex items-center gap-3 bg-emerald-900/20 border border-emerald-500/30 rounded-2xl p-4">
@@ -290,7 +289,7 @@ const WalletSelector = ({ isOpen, onClose, onConnected }) => {
               </div>
             )}
 
-            {/* ── SELECT STATE ── */}
+            {/* Select state */}
             {step === "select" && (
               <div className="space-y-4">
                 {error && (

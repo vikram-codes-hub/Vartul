@@ -1,6 +1,5 @@
 /**
  * WalletPage — Dashboard Wallet Page
- * ====================================
  * Full wallet management: Phantom, Backpack, Solflare connection,
  * TWT + SOL balance, airdrop, explorer link, transaction history.
  */
@@ -42,7 +41,7 @@ const WalletPage = () => {
 
   const brand = WALLET_BRANDS[walletType] || WALLET_BRANDS.manual;
 
-  // ── Sync wallet state from localStorage ───────────────────────────────────
+  // Sync wallet state from localStorage
   useEffect(() => {
     const sync = () => {
       setWalletAddress(localStorage.getItem('vartul_wallet_address') || '');
@@ -52,7 +51,7 @@ const WalletPage = () => {
     return () => window.removeEventListener('vartul_wallet_changed', sync);
   }, []);
 
-  // ── Fetch on-chain balances ────────────────────────────────────────────────
+  // Fetch on-chain balances
   const fetchBalances = useCallback(async () => {
     if (!walletAddress) return;
     setBalanceLoading(true);
@@ -78,7 +77,7 @@ const WalletPage = () => {
     }
   }, [walletAddress]);
 
-  // ── Fetch on-chain transactions ────────────────────────────────────────────
+  // Fetch on-chain transactions
   const fetchTransactions = useCallback(async () => {
     if (!walletAddress) return;
     setTxLoading(true);
@@ -99,7 +98,7 @@ const WalletPage = () => {
     }
   }, [walletAddress, fetchBalances, fetchTransactions]);
 
-  // ── Airdrop ────────────────────────────────────────────────────────────────
+  // Airdrop
   const handleAirdrop = async () => {
     if (!walletAddress) { setShowSelector(true); return; }
     setAirdropping(true);
@@ -114,7 +113,7 @@ const WalletPage = () => {
     }
   };
 
-  // ── Disconnect ─────────────────────────────────────────────────────────────
+  // Disconnect
   const handleDisconnect = async () => {
     try {
       if (walletType === 'backpack' && window.backpack) await window.backpack.disconnect();
@@ -138,13 +137,13 @@ const WalletPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* ── Header ── */}
+      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">Wallet</h1>
         <p className="text-gray-400 text-sm mt-1">Manage your Solana wallet, balances, and transaction history.</p>
       </div>
 
-      {/* ── Not connected ── */}
+      {/* Not connected */}
       {!walletAddress && (
         <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-purple-900/40 via-indigo-900/30 to-black border border-purple-500/30 p-10 text-center">
           <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none" />
@@ -183,7 +182,7 @@ const WalletPage = () => {
         </div>
       )}
 
-      {/* ── Connected ── */}
+      {/* Connected */}
       {walletAddress && (
         <>
           {/* Wallet Identity Card */}

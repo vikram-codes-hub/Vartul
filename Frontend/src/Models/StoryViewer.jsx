@@ -22,18 +22,14 @@ const StoryViewer = () => {
   const currentStory =
     activeUserStories?.stories?.[activeStoryIndex] || null;
 
-  /* =========================
-     MARK VIEWED
-  ========================= */
+  /* Mark viewed */
   useEffect(() => {
     if (currentStory?._id) {
       viewStory(currentStory._id);
     }
   }, [currentStory?._id]);
 
-  /* =========================
-     AUTO PROGRESS
-  ========================= */
+  /* Auto progress */
   useEffect(() => {
     if (!currentStory) return;
 
@@ -52,9 +48,7 @@ const StoryViewer = () => {
     return () => clearInterval(timerRef.current);
   }, [activeStoryIndex, currentStory]);
 
-  /* =========================
-     KEYBOARD CONTROLS ✅
-  ========================= */
+  /* Keyboard controls ✅ */
   useEffect(() => {
     const handleKey = (e) => {
       if (e.key === "Escape") closeStoryViewer();

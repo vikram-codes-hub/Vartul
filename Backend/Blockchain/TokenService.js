@@ -1,6 +1,6 @@
 /**
  * TokenService.js — Real SPL Token Transfer Service
- * ====================================================
+ 
  * Uses the platform authority wallet (PLATFORM_PRIVATE_KEY from .env)
  * to perform real on-chain SPL token transfers on Solana Devnet.
  *
@@ -26,7 +26,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 
-// ── Config ──────────────────────────────────────────────────────────────────
+// Config
 const RPC_URL = process.env.SOLANA_RPC || clusterApiUrl("devnet");
 const NETWORK = RPC_URL.includes("devnet") ? "devnet" : (process.env.SOLANA_NETWORK || "devnet");
 const TOKEN_MINT = process.env.TOKEN_MINT;
@@ -38,8 +38,7 @@ if (!TOKEN_MINT) {
   console.log(`[TokenService] ✅ Loaded TOKEN_MINT: ${TOKEN_MINT} | Network: ${NETWORK}`);
 }
 
-// ── Singleton Connection ────────────────────────────────────────────────────
-let _connection = null;
+// Singleton connection
 const getConnection = () => {
   if (!_connection) {
     _connection = new Connection(RPC_URL, "confirmed");
@@ -47,7 +46,7 @@ const getConnection = () => {
   return _connection;
 };
 
-// ── Load Platform Authority Keypair ────────────────────────────────────────
+// Load platform authority keypair
 let _platformKeypair = null;
 export const getPlatformKeypair = () => {
   if (_platformKeypair) return _platformKeypair;
@@ -64,7 +63,7 @@ export const getPlatformKeypair = () => {
   }
 };
 
-// ── Get Mint Info ────────────────────────────────────────────────────────────
+// Get mint info
 export const getMintInfo = async () => {
   try {
     const conn = getConnection();
@@ -95,7 +94,7 @@ export const getMintInfo = async () => {
   }
 };
 
-// ── Get TWT Balance for a Wallet ─────────────────────────────────────────────
+// Get TWT balance for a wallet
 export const getTwtBalance = async (walletAddress) => {
   try {
     const conn = getConnection();
@@ -115,7 +114,7 @@ export const getTwtBalance = async (walletAddress) => {
   }
 };
 
-// ── Get SOL Balance ──────────────────────────────────────────────────────────
+// Get SOL balance
 export const getSolBalance = async (walletAddress) => {
   try {
     const conn = getConnection();
@@ -128,7 +127,7 @@ export const getSolBalance = async (walletAddress) => {
   }
 };
 
-// ── Airdrop TWT to a User Wallet (Platform → User) ───────────────────────────
+// Airdrop TWT to a user wallet (Platform → User)
 export const airdropTWT = async (recipientWalletAddress, amount) => {
   const platformKeypair = getPlatformKeypair();
   if (!platformKeypair) {
@@ -187,7 +186,7 @@ export const airdropTWT = async (recipientWalletAddress, amount) => {
   }
 };
 
-// ── Get Recent Transactions for a Wallet ────────────────────────────────────
+// Get recent transactions for a wallet
 export const getWalletTransactions = async (walletAddress, limit = 15) => {
   try {
     const conn = getConnection();
@@ -221,7 +220,7 @@ export const getWalletTransactions = async (walletAddress, limit = 15) => {
   }
 };
 
-// ── Verify a Transaction ─────────────────────────────────────────────────────
+// Verify a transaction
 export const verifyTransaction = async (txSignature) => {
   try {
     const conn = getConnection();
@@ -236,7 +235,7 @@ export const verifyTransaction = async (txSignature) => {
   }
 };
 
-// ── Get Network Info ─────────────────────────────────────────────────────────
+// Get network info
 export const getNetworkInfo = async () => {
   try {
     const conn = getConnection();

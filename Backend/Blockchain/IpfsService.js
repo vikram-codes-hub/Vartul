@@ -1,6 +1,5 @@
 /**
  * IPFS / Pinata Integration Service
- * ===================================
  * Uploads files (videos, images) to IPFS via Pinata API.
  * Stores only the IPFS CID (content hash) in MongoDB — the content
  * itself is fully decentralized and tamper-proof.
@@ -8,7 +7,6 @@
  * Setup: Set PINATA_API_KEY and PINATA_SECRET_API_KEY in your .env
  * Fallback: If Pinata keys are missing, falls back to returning null.
  *
- * Install: npm install form-data axios
  */
 
 import axios from "axios";
@@ -26,7 +24,7 @@ const isConfigured = () => !!(PINATA_API_KEY && PINATA_SECRET);
 /**
  * Upload a file buffer to IPFS via Pinata.
  * @param {Buffer} buffer - File buffer
- * @param {string} filename - Original filename (for Pinata metadata)
+ * @param {string} filename - Original filename 
  * @param {string} contentType - MIME type
  * @returns {Promise<{cid: string, url: string} | null>}
  */
@@ -78,9 +76,9 @@ export const uploadFileToIPFS = async (buffer, filename, contentType = "video/mp
 };
 
 /**
- * Upload JSON metadata to IPFS (e.g., post metadata, engagement records).
+ * upload json metadata to ipfs via pinata
  * @param {object} metadata
- * @param {string} name - Metadata name
+ * @param {string} name 
  * @returns {Promise<{cid: string, url: string} | null>}
  */
 export const uploadMetadataToIPFS = async (metadata, name = "vartul-metadata") => {
@@ -114,7 +112,7 @@ export const uploadMetadataToIPFS = async (metadata, name = "vartul-metadata") =
 };
 
 /**
- * Resolve an IPFS CID to a gateway URL.
+ * resolve a cid to a full URL via the configured IPFS gateway
  * @param {string} cid
  * @returns {string}
  */

@@ -63,7 +63,7 @@ const App = () => {
       <ToastContainer />
 
       <Routes>
-        {/* ================= AUTH ================= */}
+        {/* Auth */}
         <Route
           path="/auth"
           element={
@@ -75,7 +75,7 @@ const App = () => {
           }
         />
 
-        {/* ================= PROFILE SETUP ================= */}
+        {/* Profile setup */}
         <Route
           path="/profile-setup/basic-info"
           element={authuser ? <BasicInfo /> : <Navigate to="/auth" />}
@@ -89,7 +89,7 @@ const App = () => {
           element={authuser ? <ProfilePicture /> : <Navigate to="/auth" />}
         />
 
-        {/* ================= MAIN APP (WITH SIDEBAR) ================= */}
+        {/* Main app (with sidebar) */}
         <Route element={<Layout hideSidebar={hideSidebar} />}>
           <Route
             path="/"
@@ -142,14 +142,14 @@ const App = () => {
           />
         </Route>
 
-        {/* ================= POST MODAL ================= */}
+        {/* Post modal */}
         <Route
           path="/p/:postId"
           element={authuser ? <PostModal /> : <Navigate to="/auth" />}
         />
       </Routes>
 
-      {/* ================= FOOTER ================= */}
+      {/* Footer */}
       {!hideFooter && <Footer />}
 
       {/* 🔥 STORY VIEWER MODAL (Global - renders when activeUserStories exists) */}

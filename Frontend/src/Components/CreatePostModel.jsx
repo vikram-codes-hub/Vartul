@@ -13,9 +13,7 @@ const CreatePostModal = ({ open, onClose }) => {
 
   if (!open) return null;
 
-  // ==============================
-  // FILE SELECT
-  // ==============================
+  // File select
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -27,9 +25,7 @@ const CreatePostModal = ({ open, onClose }) => {
     reader.readAsDataURL(file);
   };
 
-  // ==============================
-  // DRAG & DROP
-  // ==============================
+  // Drag & drop
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -55,9 +51,7 @@ const CreatePostModal = ({ open, onClose }) => {
     }
   };
 
-  // ==============================
-  // SHARE POST
-  // ==============================
+  // Share post
   const handleShare = async () => {
     if (!preview) return;
 
@@ -76,9 +70,7 @@ const CreatePostModal = ({ open, onClose }) => {
     }
   };
 
-  // ==============================
-  // GO BACK
-  // ==============================
+  // Go back
   const handleBack = () => {
     setPreview(null);
     setCaption("");

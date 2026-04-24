@@ -4,9 +4,7 @@ import cloudinary from "../Config/cloudinary.js";
 import redisClient, { redisReady } from "../Config/redis.js";
 
 
-// ==============================
-// CREATE POST
-// ==============================
+// Create post
 export const createPost = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -61,9 +59,7 @@ export const createPost = async (req, res) => {
 };
 
 
-// ==============================
-// FEED POSTS (FOLLOWING + SELF)
-// ==============================
+// Feed posts
 import Follow from "../Models/Follow.js";
 
 export const getFeedPosts = async (req, res) => {
@@ -123,9 +119,7 @@ export const getFeedPosts = async (req, res) => {
 
 
 
-// ==============================
-// GET USER POSTS
-// ==============================
+// Get user posts
 export const getUserPosts = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -145,9 +139,7 @@ export const getUserPosts = async (req, res) => {
 };
 
 
-// ==============================
-// LIKE / UNLIKE POST
-// ==============================
+// Like / unlike post
 export const likePost = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -184,9 +176,7 @@ export const likePost = async (req, res) => {
 };
 
 
-// ==============================
-// COMMENT ON POST
-// ==============================
+// Comment on post
 export const commentOnPost = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -271,9 +261,7 @@ export const getPostById = async (req, res) => {
 
 
 
-// ==============================
-// DELETE POST
-// ==============================
+// Delete post
 export const deletePost = async (req, res) => {
   try {
     const { postId } = req.params;

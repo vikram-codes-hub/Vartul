@@ -17,27 +17,27 @@ const useWatchTime = (reelId, videoDuration, isPlaying, videoRef = null) => {
   const [watchTimeMs, setWatchTimeMs] = useState(0);
   const [trustScore,  setTrustScore]  = useState(100);
 
-  // ── Core watch tracking ──────────────────────────────────────────────────────
+  // Core watch tracking
   const startTimeRef      = useRef(null);
   const totalWatchTimeRef = useRef(0);
   const hasSentRef        = useRef(false);
 
-  // ── Session-level signals ────────────────────────────────────────────────────
+  // Session-level signals
   const sessionStartRef      = useRef(Date.now());
   const videosWatchedRef     = useRef(1);
   const videoStartTimeRef    = useRef(null);   // video.currentTime when play started
 
-  // ── Scroll speed tracking ────────────────────────────────────────────────────
+  // Scroll speed tracking
   const scrollEventsRef   = useRef([]);        // timestamps of scroll events
   const lastScrollTimeRef = useRef(null);
 
-  // ── Interaction counts (session-level) ───────────────────────────────────────
+  // Interaction counts (session-level)
   const interactionsRef = useRef({ likes: 0, shares: 0, comments: 0 });
 
-  // ── Tab visibility (pause watch time when tab is hidden) ─────────────────────
+  // Tab visibility (pause watch time when tab is hidden)
   const hiddenAtRef = useRef(null);
 
-  // ── Computed scroll speed (events/sec over last 3s window) ───────────────────
+  // Computed scroll speed (events/sec over last 3s window)
   const getScrollSpeed = useCallback(() => {
     const now = Date.now();
     const window3s = scrollEventsRef.current.filter(t => now - t < 3000);
@@ -45,7 +45,7 @@ const useWatchTime = (reelId, videoDuration, isPlaying, videoRef = null) => {
     return parseFloat((window3s.length / 3).toFixed(2)); // events per second
   }, []);
 
-  // ── Real skip time: how deep into the video they started (currentTime at play)
+  // Real skip time: how deep into the video they started (currentTime at play)
   const getSkipTime = useCallback(() => {
     if (videoStartTimeRef.current !== null) return videoStartTimeRef.current;
     // Fallback: read from the video element directly
@@ -53,7 +53,7 @@ const useWatchTime = (reelId, videoDuration, isPlaying, videoRef = null) => {
     return 0;
   }, [videoRef]);
 
-  // ── Reset on reel change ─────────────────────────────────────────────────────
+  // Reset on reel change
   useEffect(() => {
     setWatchTimeMs(0);
     startTimeRef.current      = null;
@@ -64,7 +64,7 @@ const useWatchTime = (reelId, videoDuration, isPlaying, videoRef = null) => {
     scrollEventsRef.current   = [];
   }, [reelId]);
 
-  // ── Scroll speed listener ────────────────────────────────────────────────────
+  // Scroll speed listener
   useEffect(() => {
     const handleScroll = () => {
       const now = Date.now();
@@ -82,7 +82,7 @@ const useWatchTime = (reelId, videoDuration, isPlaying, videoRef = null) => {
     };
   }, []);
 
-  // ── Tab visibility: don't count hidden time as watch time ────────────────────
+  // Tab visibility: don't count hidden time as watch time
   useEffect(() => {
     const handleVisibility = () => {
       if (document.hidden) {
@@ -105,7 +105,7 @@ const useWatchTime = (reelId, videoDuration, isPlaying, videoRef = null) => {
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [isPlaying]);
 
-  // ── Heartbeat response handler ───────────────────────────────────────────────
+  // Heartbeat response handler
   const handleHeartbeatResponse = useCallback((data) => {
     if (!data) return;
 
@@ -128,7 +128,7 @@ const useWatchTime = (reelId, videoDuration, isPlaying, videoRef = null) => {
     }
   }, []);
 
-  // ── Main play/pause effect + heartbeat interval ──────────────────────────────
+  // Main play/pause effect + heartbeat interval
   useEffect(() => {
     let interval;
 
@@ -166,7 +166,7 @@ const useWatchTime = (reelId, videoDuration, isPlaying, videoRef = null) => {
           watchPercentage:  Math.round(watchPercentage),
           sessionDuration,
           videosPerSession: videosWatchedRef.current,
-          // ── REAL signals ──
+          // REAL signals
           scrollSpeed:      getScrollSpeed(),
           skipTime:         getSkipTime(),
           likes:            interactionsRef.current.likes,
@@ -197,7 +197,7 @@ const useWatchTime = (reelId, videoDuration, isPlaying, videoRef = null) => {
     };
   }, [isPlaying, reelId, videoDuration, videoRef, getScrollSpeed, getSkipTime, handleHeartbeatResponse]);
 
-  // ── Flush final watch data on reel change / unmount ─────────────────────────
+  // Flush final watch data on reel change / unmount
   const flushWatchData = () => {
     if (hasSentRef.current) return;
 
@@ -222,7 +222,7 @@ const useWatchTime = (reelId, videoDuration, isPlaying, videoRef = null) => {
     hasSentRef.current = true;
   };
 
-  // ── Track interactions (call these from your Like/Share/Comment handlers) ────
+  // Track interactions (call these from your Like/Share/Comment handlers)
   const trackLike    = useCallback(() => { interactionsRef.current.likes++;    }, []);
   const trackShare   = useCallback(() => { interactionsRef.current.shares++;   }, []);
   const trackComment = useCallback(() => { interactionsRef.current.comments++; }, []);

@@ -95,7 +95,7 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
 
-    // ── IVTG — Initial Virtual Token Grant ──────────────────────────────
+    // IVTG — Initial Virtual Token Grant
     virtualTwtBalance: {
       type: Number,
       default: 0,
